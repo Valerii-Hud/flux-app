@@ -5,12 +5,13 @@ import {
   logout,
   signup,
 } from '../controllers/auth.controllers';
+import { validateSignup } from '../middlewares/auth.middleware';
 
 const router: Router = express.Router();
 
 router.get('/check-auth', checkAuth);
 
-router.post('/signup', signup);
+router.post('/signup', validateSignup, signup);
 router.post('/login', login);
 router.post('/logout', logout);
 
