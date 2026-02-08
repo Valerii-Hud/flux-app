@@ -6,6 +6,5 @@ interface UserExists {
 }
 
 export const isUserExists = async ({ key, data }: UserExists) => {
-  const user = await User.find({ [`${key}`]: data });
-  return !(user.length === 0);
+  return !!(await User.exists({ [`${key}`]: data }));
 };

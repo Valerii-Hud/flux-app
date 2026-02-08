@@ -8,6 +8,9 @@ export interface User {
   userName?: string;
   email: string;
   password: string;
+  createdAt?: string;
+  updatedAt?: string;
+  isVerified?: boolean;
 }
 
 export interface AuthRequest extends Request {

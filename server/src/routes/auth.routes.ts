@@ -5,14 +5,14 @@ import {
   logout,
   signup,
 } from '../controllers/auth.controllers';
-import { validateSignup } from '../middlewares/auth.middleware';
+import { validateLogin, validateSignup } from '../middlewares/auth.middleware';
 
 const router: Router = express.Router();
 
 router.get('/check-auth', checkAuth);
 
 router.post('/signup', validateSignup, signup);
-router.post('/login', login);
+router.post('/login', validateLogin, login);
 router.post('/logout', logout);
 
 export default router;

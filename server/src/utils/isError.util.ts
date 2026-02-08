@@ -11,11 +11,11 @@ const isError = ({ error, functionName, handler }: ErrorType) => {
     console.error(
       chalk.red(`Error on ${functionName} ${handler}: ${error.message}`)
     );
+  } else {
+    console.error(
+      chalk.bgRed(`Unexpected error on ${functionName} ${handler}: ${error}`)
+    );
   }
-
-  console.error(
-    chalk.bgRed(`Unexpected error on ${functionName} ${handler}: ${error}`)
-  );
 };
 
 export default isError;
