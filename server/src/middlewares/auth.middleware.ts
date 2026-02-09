@@ -4,6 +4,10 @@ import { isUserExists } from '../utils/isUserExists';
 import isError from '../utils/isError.util';
 import type { AuthRequest } from '../types';
 import { AuthError, responseWithAuthError } from '../errors/auth.errors';
+import jwt, { type JwtPayload } from 'jsonwebtoken';
+import ENV_VARS from '../utils/envVars.util';
+import User from '../models/user.model';
+
 export const validateSignup = async (
   req: AuthRequest,
   res: Response,
@@ -112,6 +116,41 @@ export const validateLogin = async (
     isError({
       error,
       functionName: validateLogin.name,
+      handler: 'middleware',
+    });
+    responseWithAuthError(res, 500, AuthError.INTERNAL_SERVER_ERROR);
+  }
+};
+
+export const protectRoute = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const token = req.cookies.secret_token;
+    const { JWT_SECRET } = ENV_VARS;
+    if (!token) {
+      return responseWithAuthError(res, 401, AuthError.NO_TOKEN_PROVIDED);
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    if (!decoded) {
+      return responseWithAuthError(res, 401, AuthError.INVALID_TOKEN);
+    }
+
+    const user = await User.findById(decoded.userId).select('-password');
+
+    if (!user) {
+      return responseWithAuthError(res, 404, AuthError.USER_NOT_FOUND);
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    isError({
+      error,
+      functionName: protectRoute.name,
       handler: 'middleware',
     });
     responseWithAuthError(res, 500, AuthError.INTERNAL_SERVER_ERROR);

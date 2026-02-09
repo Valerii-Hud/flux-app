@@ -4,11 +4,17 @@ import User from '../models/user.model';
 import { compare, genSalt, hash } from 'bcryptjs';
 import generateTokenAndSetCookies from '../utils/generateTokenAndSetCookies';
 import isError from '../utils/isError.util';
+import { AuthError, responseWithAuthError } from '../errors/auth.errors';
+import ENV_VARS from '../utils/envVars.util';
 
-export const checkAuth = (req: Request, res: Response) => {
+export const checkAuth = async (req: AuthRequest, res: Response) => {
   try {
-    res.status(200).json({ success: true });
-  } catch (error) {}
+    const user = await User.findById(req.user?._id).select('-password');
+    res.status(200).json(user);
+  } catch (error) {
+    isError({ error, functionName: checkAuth.name, handler: 'controller' });
+    responseWithAuthError(res, 500, AuthError.INTERNAL_SERVER_ERROR);
+  }
 };
 
 export const signup = async (req: AuthRequest, res: Response) => {
@@ -25,7 +31,7 @@ export const signup = async (req: AuthRequest, res: Response) => {
         password: hashedPassword,
       });
       generateTokenAndSetCookies(res, newUser._id);
-      return res.status(200).json({
+      return res.status(201).json({
         _id: newUser._id,
         fullName: newUser.fullName,
         userName: newUser.userName,
@@ -34,11 +40,11 @@ export const signup = async (req: AuthRequest, res: Response) => {
         updatedAt: newUser.updatedAt,
       });
     } else {
-      return res.status(400).json({ error: 'Invalid request' });
+      return responseWithAuthError(res, 400, AuthError.INVALID_REQUEST);
     }
   } catch (error) {
     isError({ error, functionName: signup.name, handler: 'controller' });
-    res.status(500).json({ error: 'Internal Server Error' });
+    responseWithAuthError(res, 500, AuthError.INTERNAL_SERVER_ERROR);
   }
 };
 
@@ -50,16 +56,16 @@ export const login = async (req: AuthRequest, res: Response) => {
       const currentUser = await User.findOne({ email: user.email });
 
       if (!currentUser) {
-        return res.status(500).json({ error: 'Something went wrong' });
+        return responseWithAuthError(res, 401, AuthError.INVALID_CREDENTIALS);
       }
 
       const isPasswordCorrect = await compare(
         user.password,
-        currentUser.password
+        currentUser.password || ''
       );
 
       if (!isPasswordCorrect) {
-        return res.status(401).json({ error: 'Invalid credentials' });
+        return responseWithAuthError(res, 401, AuthError.INVALID_CREDENTIALS);
       }
 
       generateTokenAndSetCookies(res, currentUser._id);
@@ -76,10 +82,20 @@ export const login = async (req: AuthRequest, res: Response) => {
     }
   } catch (error) {
     isError({ error, functionName: login.name, handler: 'controller' });
-    res.status(500).json({ error: 'Internal Server Error' });
+    responseWithAuthError(res, 500, AuthError.INTERNAL_SERVER_ERROR);
   }
 };
 export const logout = (req: Request, res: Response) => {
+  const { NODE_ENV } = ENV_VARS;
   try {
-  } catch (error) {}
+    res.clearCookie('secret_token', {
+      httpOnly: true,
+      secure: NODE_ENV === 'production',
+      sameSite: NODE_ENV === 'production' ? 'strict' : 'lax',
+    });
+    res.status(200).json({ message: 'Logout successfully' });
+  } catch (error) {
+    isError({ error, functionName: logout.name, handler: 'controller' });
+    responseWithAuthError(res, 500, AuthError.INTERNAL_SERVER_ERROR);
+  }
 };

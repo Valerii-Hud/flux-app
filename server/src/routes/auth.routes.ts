@@ -5,11 +5,15 @@ import {
   logout,
   signup,
 } from '../controllers/auth.controllers';
-import { validateLogin, validateSignup } from '../middlewares/auth.middleware';
+import {
+  protectRoute,
+  validateLogin,
+  validateSignup,
+} from '../middlewares/auth.middleware';
 
 const router: Router = express.Router();
 
-router.get('/check-auth', checkAuth);
+router.get('/check-auth', protectRoute, checkAuth);
 
 router.post('/signup', validateSignup, signup);
 router.post('/login', validateLogin, login);

@@ -8,8 +8,8 @@ export interface User {
   userName?: string;
   email: string;
   password: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: NativeDate;
+  updatedAt?: NativeDate;
   isVerified?: boolean;
 }
 
