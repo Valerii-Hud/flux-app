@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
 import postRoutes from './routes/post.routes';
+import notificationRoutes from './routes/notification.routes';
 
 import connectToMongoDB from './db/connectToMongoDB';
 
@@ -20,6 +21,7 @@ app.use(cookieParser(COOKIE_PARSER_SECRET));
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/posts', postRoutes);
+app.use('/api/v1/notification', notificationRoutes);
 
 app.listen(PORT, () => {
   connectToMongoDB(MONGO_URI);
