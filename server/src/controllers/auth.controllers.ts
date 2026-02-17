@@ -4,7 +4,7 @@ import User from '../models/user.model';
 import { compare, genSalt, hash } from 'bcryptjs';
 import generateTokenAndSetCookies from '../utils/generateTokenAndSetCookies';
 import isError from '../utils/isError.util';
-import { AuthError, responseWithAuthError } from '../errors/auth.errors';
+import { ErrorType, responseWithError } from '../errors/response.errors';
 import ENV_VARS from '../utils/envVars.util';
 
 export const checkAuth = async (req: AuthRequest, res: Response) => {
@@ -13,7 +13,7 @@ export const checkAuth = async (req: AuthRequest, res: Response) => {
     res.status(200).json(user);
   } catch (error) {
     isError({ error, functionName: checkAuth.name, handler: 'controller' });
-    responseWithAuthError(res, 500, AuthError.INTERNAL_SERVER_ERROR);
+    responseWithError(res);
   }
 };
 
@@ -40,11 +40,11 @@ export const signup = async (req: AuthRequest, res: Response) => {
         updatedAt: newUser.updatedAt,
       });
     } else {
-      return responseWithAuthError(res, 400, AuthError.INVALID_REQUEST);
+      return responseWithError(res, 400, ErrorType.INVALID_REQUEST);
     }
   } catch (error) {
     isError({ error, functionName: signup.name, handler: 'controller' });
-    responseWithAuthError(res, 500, AuthError.INTERNAL_SERVER_ERROR);
+    responseWithError(res);
   }
 };
 
@@ -56,7 +56,7 @@ export const login = async (req: AuthRequest, res: Response) => {
       const currentUser = await User.findOne({ email: user.email });
 
       if (!currentUser) {
-        return responseWithAuthError(res, 401, AuthError.INVALID_CREDENTIALS);
+        return responseWithError(res, 401, ErrorType.INVALID_CREDENTIALS);
       }
 
       const isPasswordCorrect = await compare(
@@ -65,7 +65,7 @@ export const login = async (req: AuthRequest, res: Response) => {
       );
 
       if (!isPasswordCorrect) {
-        return responseWithAuthError(res, 401, AuthError.INVALID_CREDENTIALS);
+        return responseWithError(res, 401, ErrorType.INVALID_CREDENTIALS);
       }
 
       generateTokenAndSetCookies(res, currentUser._id);
@@ -82,7 +82,7 @@ export const login = async (req: AuthRequest, res: Response) => {
     }
   } catch (error) {
     isError({ error, functionName: login.name, handler: 'controller' });
-    responseWithAuthError(res, 500, AuthError.INTERNAL_SERVER_ERROR);
+    responseWithError(res);
   }
 };
 export const logout = (req: Request, res: Response) => {
@@ -96,6 +96,6 @@ export const logout = (req: Request, res: Response) => {
     res.status(200).json({ message: 'Logout successfully' });
   } catch (error) {
     isError({ error, functionName: logout.name, handler: 'controller' });
-    responseWithAuthError(res, 500, AuthError.INTERNAL_SERVER_ERROR);
+    responseWithError(res);
   }
 };

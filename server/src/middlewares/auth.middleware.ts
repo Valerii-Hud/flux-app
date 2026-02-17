@@ -3,7 +3,7 @@ import * as EmailValidator from 'email-validator';
 import { isUserExists } from '../utils/isUserExists';
 import isError from '../utils/isError.util';
 import type { AuthRequest } from '../types';
-import { AuthError, responseWithAuthError } from '../errors/auth.errors';
+import { ErrorType, responseWithError } from '../errors/response.errors';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 import ENV_VARS from '../utils/envVars.util';
 import User from '../models/user.model';
@@ -32,15 +32,15 @@ export const validateSignup = async (
     }
 
     if (trimmedPassword.length < 8) {
-      return responseWithAuthError(res, 400, AuthError.MIN_PASSWORD_LENGTH);
+      return responseWithError(res, 400, ErrorType.MIN_PASSWORD_LENGTH);
     }
 
     if (trimmedFullName.length < 3 || trimmedFullName.length > 128) {
-      return responseWithAuthError(res, 400, AuthError.MIN_MAX_FULLNAME_LENGTH);
+      return responseWithError(res, 400, ErrorType.MIN_MAX_FULLNAME_LENGTH);
     }
 
     if (!EmailValidator.validate(trimmedEmail)) {
-      return responseWithAuthError(res, 400, AuthError.INCORRECT_EMAIL);
+      return responseWithError(res, 400, ErrorType.INCORRECT_EMAIL);
     }
 
     const fetchedByEmail = await isUserExists({
@@ -54,7 +54,7 @@ export const validateSignup = async (
     });
 
     if (fetchedByEmail || fetchedByUserName) {
-      return responseWithAuthError(res, 400, AuthError.INVALID_CREDENTIALS);
+      return responseWithError(res, 400, ErrorType.INVALID_CREDENTIALS);
     }
 
     const user = {
@@ -73,7 +73,7 @@ export const validateSignup = async (
       functionName: validateSignup.name,
       handler: 'middleware',
     });
-    responseWithAuthError(res, 500, AuthError.INTERNAL_SERVER_ERROR);
+    responseWithError(res);
   }
 };
 
@@ -86,7 +86,7 @@ export const validateLogin = async (
     const { password, email } = req.body;
 
     if (!password || !email) {
-      return responseWithAuthError(res, 400, AuthError.ALL_FIELDS_ARE_REQUIRED);
+      return responseWithError(res, 400, ErrorType.ALL_FIELDS_ARE_REQUIRED);
     }
 
     const trimmedEmail = email.trim();
@@ -98,11 +98,11 @@ export const validateLogin = async (
     });
 
     if (!fetchedByEmail) {
-      return responseWithAuthError(res, 400, AuthError.INVALID_CREDENTIALS);
+      return responseWithError(res, 400, ErrorType.INVALID_CREDENTIALS);
     }
 
     if (!EmailValidator.validate(trimmedEmail)) {
-      return responseWithAuthError(res, 400, AuthError.INCORRECT_EMAIL);
+      return responseWithError(res, 400, ErrorType.INCORRECT_EMAIL);
     }
 
     const user = {
@@ -118,7 +118,7 @@ export const validateLogin = async (
       functionName: validateLogin.name,
       handler: 'middleware',
     });
-    responseWithAuthError(res, 500, AuthError.INTERNAL_SERVER_ERROR);
+    responseWithError(res);
   }
 };
 
@@ -131,18 +131,18 @@ export const protectRoute = async (
     const token = req.cookies.secret_token;
     const { JWT_SECRET } = ENV_VARS;
     if (!token) {
-      return responseWithAuthError(res, 401, AuthError.NO_TOKEN_PROVIDED);
+      return responseWithError(res, 401, ErrorType.NO_TOKEN_PROVIDED);
     }
 
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
     if (!decoded) {
-      return responseWithAuthError(res, 401, AuthError.INVALID_TOKEN);
+      return responseWithError(res, 401, ErrorType.INVALID_TOKEN);
     }
 
     const user = await User.findById(decoded.userId).select('-password');
 
     if (!user) {
-      return responseWithAuthError(res, 404, AuthError.USER_NOT_FOUND);
+      return responseWithError(res, 404, ErrorType.USER_NOT_FOUND);
     }
 
     req.user = user;
@@ -153,6 +153,6 @@ export const protectRoute = async (
       functionName: protectRoute.name,
       handler: 'middleware',
     });
-    responseWithAuthError(res, 500, AuthError.INTERNAL_SERVER_ERROR);
+    responseWithError(res);
   }
 };
