@@ -52,8 +52,6 @@ export const getSuggestedUsers = async (req: AuthRequest, res: Response) => {
     const suggestedUsers = filteredUsers.slice(0, 4);
     suggestedUsers.forEach((user) => (user.password = null));
 
-    console.log(suggestedUsers);
-
     res.status(200).json(suggestedUsers);
   } catch (error) {
     isError({

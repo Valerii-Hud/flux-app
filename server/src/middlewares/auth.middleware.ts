@@ -84,7 +84,6 @@ export const validateLogin = async (
 ) => {
   try {
     const { password, email } = req.body;
-    console.log(password, email);
     if (!password || !email) {
       return responseWithError(res, 400, ErrorType.ALL_FIELDS_ARE_REQUIRED);
     }
@@ -128,7 +127,8 @@ export const protectRoute = async (
   next: NextFunction
 ) => {
   try {
-    const token = req.cookies.secret_token;
+    const token = req.signedCookies.secret_token;
+
     const { JWT_SECRET } = ENV_VARS;
     if (!token) {
       return responseWithError(res, 401, ErrorType.NO_TOKEN_PROVIDED);

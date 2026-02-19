@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import useAuthFormStore from './useAuthFormStore';
-import { errorHandler } from '../types';
+import { errorHandler, type User } from '../types';
 import axiosInstance from '../utils/api/axios';
 import toast from 'react-hot-toast';
 
@@ -8,6 +8,7 @@ type Endpoint = 'signup' | 'login' | 'logout' | 'check-auth';
 type Method = 'get' | 'post';
 
 interface AuthStore {
+  user: User | null;
   helperAuth: (
     endpoint: Endpoint,
     successMessage?: string,
@@ -19,15 +20,17 @@ interface AuthStore {
   checkAuth: () => void;
 }
 
-const useAuthStore = create<AuthStore>((_set, get) => ({
+const useAuthStore = create<AuthStore>((set, get) => ({
+  user: null,
   helperAuth: async (endpoint, successMessage, method = 'post') => {
     const { user, resetStates } = useAuthFormStore.getState();
-    console.log(user);
     try {
       const response = await axiosInstance[method](
         `/api/v1/auth/${endpoint}`,
         method === 'post' ? user : undefined
       );
+
+      set({ user: response.data });
 
       if (response.status === 200 || response.status === 201) {
         resetStates();
@@ -36,7 +39,7 @@ const useAuthStore = create<AuthStore>((_set, get) => ({
           toast.success(response.data.message || successMessage);
       }
     } catch (error) {
-      errorHandler(error);
+      if (endpoint !== 'check-auth') errorHandler(error);
     }
   },
   signup: () => {
@@ -53,7 +56,7 @@ const useAuthStore = create<AuthStore>((_set, get) => ({
   },
   checkAuth: () => {
     const { helperAuth } = get();
-    helperAuth('check-auth');
+    helperAuth('check-auth', undefined, 'get');
   },
 }));
 

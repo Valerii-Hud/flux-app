@@ -15,10 +15,11 @@ const generateTokenAndSetCookies = (
     });
 
     res.cookie('secret_token', token, {
-      maxAge: 1000 * 60 * 60 * 24 * 15,
+      maxAge: 1000 * 60 * 60 * 60 * 24 * 15,
       httpOnly: true,
       secure: NODE_ENV === 'production',
       sameSite: NODE_ENV === 'production' ? 'strict' : 'lax',
+      signed: true,
     });
   } catch (error) {
     isError({
