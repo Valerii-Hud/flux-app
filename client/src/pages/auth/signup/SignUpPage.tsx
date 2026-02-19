@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useState, type ChangeEvent, type SyntheticEvent } from 'react';
+import { type SyntheticEvent } from 'react';
 
 import XSvg from '../../../components/svgs/X';
 
@@ -7,22 +7,17 @@ import { MdOutlineMail } from 'react-icons/md';
 import { FaUser } from 'react-icons/fa';
 import { MdPassword } from 'react-icons/md';
 import { MdDriveFileRenameOutline } from 'react-icons/md';
+import useAuthFormStore from '../../../store/useAuthFormStore';
+import useAuthStore from '../../../store/useAuthStore';
 
 const SignUpPage = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    username: '',
-    fullName: '',
-    password: '',
-  });
+  const { user, setUserAuthData } = useAuthFormStore();
+
+  const { signup } = useAuthStore();
 
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
     e.preventDefault();
-    console.log(formData);
-  };
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    signup();
   };
 
   const isError = false;
@@ -46,8 +41,8 @@ const SignUpPage = () => {
               className="grow"
               placeholder="Email"
               name="email"
-              onChange={handleInputChange}
-              value={formData.email}
+              onChange={setUserAuthData}
+              value={user.email}
             />
           </label>
           <div className="flex gap-4 flex-wrap">
@@ -57,9 +52,9 @@ const SignUpPage = () => {
                 type="text"
                 className="grow "
                 placeholder="Username"
-                name="username"
-                onChange={handleInputChange}
-                value={formData.username}
+                name="userName"
+                onChange={setUserAuthData}
+                value={user.userName}
               />
             </label>
             <label className="input input-bordered rounded flex items-center gap-2 flex-1">
@@ -69,8 +64,8 @@ const SignUpPage = () => {
                 className="grow"
                 placeholder="Full Name"
                 name="fullName"
-                onChange={handleInputChange}
-                value={formData.fullName}
+                onChange={setUserAuthData}
+                value={user.fullName}
               />
             </label>
           </div>
@@ -81,8 +76,8 @@ const SignUpPage = () => {
               className="grow"
               placeholder="Password"
               name="password"
-              onChange={handleInputChange}
-              value={formData.password}
+              onChange={setUserAuthData}
+              value={user.password}
             />
           </label>
           <button className="btn rounded-full btn-primary text-white">

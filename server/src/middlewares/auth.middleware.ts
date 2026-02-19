@@ -20,14 +20,14 @@ export const validateSignup = async (
       return res.status(400).json({ error: 'Please provide all fields' });
     }
 
-    const trimmedUserName = userName.trim();
+    const trimmeduserName = userName.trim();
     const trimmedEmail = email.trim();
     const trimmedFullName = fullName.trim();
     const trimmedPassword = password.trim();
 
-    if (trimmedUserName.length < 3 || trimmedUserName.length > 16) {
+    if (trimmeduserName.length < 3 || trimmeduserName.length > 16) {
       return res.status(400).json({
-        error: 'Username must be at least 3 chars and less then 16',
+        error: 'userName must be at least 3 chars and less then 16',
       });
     }
 
@@ -48,17 +48,17 @@ export const validateSignup = async (
       key: 'email',
     });
 
-    const fetchedByUserName = await isUserExists({
-      data: trimmedUserName,
+    const fetchedByuserName = await isUserExists({
+      data: trimmeduserName,
       key: 'userName',
     });
 
-    if (fetchedByEmail || fetchedByUserName) {
+    if (fetchedByEmail || fetchedByuserName) {
       return responseWithError(res, 400, ErrorType.INVALID_CREDENTIALS);
     }
 
     const user = {
-      userName: trimmedUserName,
+      userName: trimmeduserName,
       password: trimmedPassword,
       fullName: trimmedFullName,
       email: trimmedEmail,
@@ -84,7 +84,7 @@ export const validateLogin = async (
 ) => {
   try {
     const { password, email } = req.body;
-
+    console.log(password, email);
     if (!password || !email) {
       return responseWithError(res, 400, ErrorType.ALL_FIELDS_ARE_REQUIRED);
     }

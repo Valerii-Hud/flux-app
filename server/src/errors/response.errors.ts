@@ -3,7 +3,7 @@ import type { Response } from 'express';
 export enum ErrorType {
   //! [Auth]:
 
-  MIN_MAX_USER_LENGTH = 'Username must be at least 3 chars and less than 16',
+  MIN_MAX_USER_LENGTH = 'userName must be at least 3 chars and less than 16',
   MIN_PASSWORD_LENGTH = 'Password must be at least 8 chars',
   MIN_MAX_FULLNAME_LENGTH = 'Fullname must be at least 3 chars and less than 128',
   INCORRECT_EMAIL = 'Email is not correct',

@@ -1,6 +1,7 @@
 import express from 'express';
 import ENV_VARS from './utils/envVars.util';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser(COOKIE_PARSER_SECRET));
+app.use(cors());
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
@@ -24,6 +26,6 @@ app.use('/api/v1/posts', postRoutes);
 app.use('/api/v1/notification', notificationRoutes);
 
 app.listen(PORT, () => {
-  connectToMongoDB(MONGO_URI);
+  connectToMongoDB(MONGO_URI, true);
   console.log(`Server started at: http://localhost:${PORT}`);
 });

@@ -223,9 +223,15 @@ export const commentPost = async (req: AuthRequest, res: Response) => {
       user: userId,
     };
 
+    const notification = new Notification({
+      from: userId,
+      to: post.user,
+      type: 'comment',
+    });
+
     post.comments.push(comment);
     await post.save();
-
+    await notification.save();
     res.status(200).json(post);
   } catch (error) {
     isError({

@@ -1,24 +1,19 @@
-import { useState, type ChangeEvent, type SyntheticEvent } from 'react';
+import { type SyntheticEvent } from 'react';
 import { Link } from 'react-router-dom';
 
 import XSvg from '../../../components/svgs/X';
 
 import { MdOutlineMail } from 'react-icons/md';
 import { MdPassword } from 'react-icons/md';
+import useAuthFormStore from '../../../store/useAuthFormStore';
+import useAuthStore from '../../../store/useAuthStore';
 
 const LoginPage = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-  });
-
+  const { user, setUserAuthData } = useAuthFormStore();
+  const { login } = useAuthStore();
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
     e.preventDefault();
-    console.log(formData);
-  };
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    login();
   };
 
   const isError = false;
@@ -37,10 +32,10 @@ const LoginPage = () => {
             <input
               type="text"
               className="grow"
-              placeholder="username"
-              name="username"
-              onChange={handleInputChange}
-              value={formData.username}
+              placeholder="Email"
+              name="email"
+              onChange={setUserAuthData}
+              value={user.email}
             />
           </label>
 
@@ -51,8 +46,8 @@ const LoginPage = () => {
               className="grow"
               placeholder="Password"
               name="password"
-              onChange={handleInputChange}
-              value={formData.password}
+              onChange={setUserAuthData}
+              value={user.password}
             />
           </label>
           <button className="btn rounded-full btn-primary text-white">

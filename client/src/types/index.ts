@@ -1,3 +1,6 @@
+import { AxiosError } from 'axios';
+import toast from 'react-hot-toast';
+
 export type Id = string;
 
 export interface User {
@@ -12,6 +15,7 @@ export interface User {
   link?: string;
   followers?: Id[] | User[];
   following?: Id[] | User[];
+  password?: string;
 }
 
 export interface Comment {
@@ -28,3 +32,9 @@ export interface PostType {
   comments?: Comment[];
   likes: Id[];
 }
+
+export const errorHandler = (error: unknown) => {
+  return error instanceof AxiosError
+    ? toast.error(error.response?.data.error)
+    : toast.error('Something went wrong');
+};
