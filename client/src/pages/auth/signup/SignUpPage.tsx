@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { type SyntheticEvent } from 'react';
+import { useState, type ChangeEvent, type SyntheticEvent } from 'react';
 
 import XSvg from '../../../components/svgs/X';
 
@@ -7,13 +7,42 @@ import { MdOutlineMail } from 'react-icons/md';
 import { FaUser } from 'react-icons/fa';
 import { MdPassword } from 'react-icons/md';
 import { MdDriveFileRenameOutline } from 'react-icons/md';
+import { type User } from '../../../types';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { errorHandler } from '../../../utils/handlers/errorHandler';
+import { successHandler } from '../../../utils/handlers/successHandler';
+import { authHelper } from '../../../utils/helpers/authHelper';
 
 const SignUpPage = () => {
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
-    e.preventDefault();
+  const [formData, setFormData] = useState<User>({
+    userName: '',
+    fullName: '',
+    email: '',
+    password: '',
+  });
+
+  const queryClient = useQueryClient();
+
+  const { mutate: signup, isPending } = useMutation({
+    mutationFn: (formData: User) =>
+      authHelper({ formData, endpoint: 'signup' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['authUser'] });
+      successHandler('Signup successfully');
+    },
+    onError: (error) => errorHandler(error),
+  });
+
+  const handleSubmit = (
+    event: SyntheticEvent<HTMLFormElement, SubmitEvent>
+  ) => {
+    event.preventDefault();
+    signup(formData);
   };
 
-  const isError = false;
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [event.target.name]: event.target.value });
+  };
 
   return (
     <div className="max-w-screen-xl mx-auto flex h-screen px-10">
@@ -34,8 +63,8 @@ const SignUpPage = () => {
               className="grow"
               placeholder="Email"
               name="email"
-              onChange={setUserAuthData}
-              value={user.email}
+              onChange={handleInputChange}
+              value={formData.email}
             />
           </label>
           <div className="flex gap-4 flex-wrap">
@@ -46,8 +75,8 @@ const SignUpPage = () => {
                 className="grow "
                 placeholder="Username"
                 name="userName"
-                onChange={setUserAuthData}
-                value={user.userName}
+                onChange={handleInputChange}
+                value={formData.userName}
               />
             </label>
             <label className="input input-bordered rounded flex items-center gap-2 flex-1">
@@ -57,8 +86,8 @@ const SignUpPage = () => {
                 className="grow"
                 placeholder="Full Name"
                 name="fullName"
-                onChange={setUserAuthData}
-                value={user.fullName}
+                onChange={handleInputChange}
+                value={formData.fullName}
               />
             </label>
           </div>
@@ -69,14 +98,13 @@ const SignUpPage = () => {
               className="grow"
               placeholder="Password"
               name="password"
-              onChange={setUserAuthData}
-              value={user.password}
+              onChange={handleInputChange}
+              value={formData.password}
             />
           </label>
           <button className="btn rounded-full btn-primary text-white">
-            Sign up
+            {isPending ? 'Loading...' : 'Sign up'}
           </button>
-          {isError && <p className="text-red-500">Something went wrong</p>}
         </form>
         <div className="flex flex-col lg:w-2/3 gap-2 mt-4">
           <p className="text-white text-lg">Already have an account?</p>

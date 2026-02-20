@@ -1,21 +1,18 @@
-import { AxiosError } from 'axios';
-import toast from 'react-hot-toast';
-
 export type Id = string;
 
 export interface User {
+  email: string;
+  password: string;
   _id?: Id;
-  userName: string;
-  fullName: string;
+  userName?: string;
+  fullName?: string;
   profileImage?: string;
   coverImage?: string;
-  email?: string;
   isVerified?: boolean;
   bio?: string;
   link?: string;
   followers?: Id[] | User[];
   following?: Id[] | User[];
-  password?: string;
 }
 
 export interface Comment {
@@ -33,8 +30,9 @@ export interface PostType {
   likes: Id[];
 }
 
-export const errorHandler = (error: unknown) => {
-  return error instanceof AxiosError
-    ? toast.error(error.response?.data.error)
-    : toast.error('Something went wrong');
-};
+export type AuthEndpoint = 'signup' | 'login' | 'logout' | 'check-auth';
+export enum HttpMethod {
+  POST = 'post',
+  GET = 'get',
+  PUT = 'put',
+}

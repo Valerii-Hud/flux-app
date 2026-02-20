@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import RightPanelSkeleton from '../skeletons/RightPanelSkeleton';
+import { USERS_FOR_RIGHT_PANEL } from '../../utils/db/dummy';
 
 const RightPanel = () => {
   const isLoading = false;
@@ -19,7 +20,7 @@ const RightPanel = () => {
             </>
           )}
           {!isLoading &&
-            suggestedUsers?.map((user) => (
+            USERS_FOR_RIGHT_PANEL?.map((user) => (
               <Link
                 to={`/profile/${user.userName}`}
                 className="flex items-center justify-between gap-4"

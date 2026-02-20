@@ -1,18 +1,39 @@
-import { type SyntheticEvent } from 'react';
+import { useState, type ChangeEvent, type SyntheticEvent } from 'react';
 import { Link } from 'react-router-dom';
 
 import XSvg from '../../../components/svgs/X';
 
 import { MdOutlineMail } from 'react-icons/md';
 import { MdPassword } from 'react-icons/md';
+import { type User } from '../../../types';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { errorHandler } from '../../../utils/handlers/errorHandler';
+import { successHandler } from '../../../utils/handlers/successHandler';
+import { authHelper } from '../../../utils/helpers/authHelper';
 
 const LoginPage = () => {
-  const handleSubmit = (e: SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
-    e.preventDefault();
-    login();
+  const [formData, setFormData] = useState<User>({
+    email: '',
+    password: '',
+  });
+  const queryClient = useQueryClient();
+  const { mutate: login, isPending } = useMutation({
+    mutationFn: (formData: User) => authHelper({ formData, endpoint: 'login' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['authUser'] });
+      successHandler('Login successfully');
+    },
+    onError: (error) => errorHandler(error),
+  });
+
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [event.target.name]: event.target.value });
   };
 
-  const isError = false;
+  const handleSubmit = (e: SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
+    e.preventDefault();
+    login(formData);
+  };
 
   return (
     <div className="max-w-screen-xl mx-auto flex h-screen">
@@ -30,8 +51,8 @@ const LoginPage = () => {
               className="grow"
               placeholder="Email"
               name="email"
-              onChange={setUserAuthData}
-              value={user.email}
+              onChange={handleInputChange}
+              value={formData.email}
             />
           </label>
 
@@ -42,14 +63,13 @@ const LoginPage = () => {
               className="grow"
               placeholder="Password"
               name="password"
-              onChange={setUserAuthData}
-              value={user.password}
+              onChange={handleInputChange}
+              value={formData.password}
             />
           </label>
           <button className="btn rounded-full btn-primary text-white">
-            Login
+            {isPending ? 'Loading...' : 'Login'}
           </button>
-          {isError && <p className="text-red-500">Something went wrong</p>}
         </form>
         <div className="flex flex-col gap-2 mt-4">
           <p className="text-white text-lg">{"Don't"} have an account?</p>
