@@ -5,12 +5,8 @@ import XSvg from '../../../components/svgs/X';
 
 import { MdOutlineMail } from 'react-icons/md';
 import { MdPassword } from 'react-icons/md';
-import useAuthFormStore from '../../../store/useAuthFormStore';
-import useAuthStore from '../../../store/useAuthStore';
 
 const LoginPage = () => {
-  const { user, setUserAuthData } = useAuthFormStore();
-  const { login } = useAuthStore();
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
     e.preventDefault();
     login();

@@ -7,17 +7,10 @@ import { MdOutlineMail } from 'react-icons/md';
 import { FaUser } from 'react-icons/fa';
 import { MdPassword } from 'react-icons/md';
 import { MdDriveFileRenameOutline } from 'react-icons/md';
-import useAuthFormStore from '../../../store/useAuthFormStore';
-import useAuthStore from '../../../store/useAuthStore';
 
 const SignUpPage = () => {
-  const { user, setUserAuthData } = useAuthFormStore();
-
-  const { signup } = useAuthStore();
-
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
     e.preventDefault();
-    signup();
   };
 
   const isError = false;

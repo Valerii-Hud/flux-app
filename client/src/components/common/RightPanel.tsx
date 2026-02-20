@@ -1,16 +1,8 @@
 import { Link } from 'react-router-dom';
 import RightPanelSkeleton from '../skeletons/RightPanelSkeleton';
-import useUsersStore from '../../store/useUsersStore';
-import { useEffect } from 'react';
 
 const RightPanel = () => {
   const isLoading = false;
-  const { suggestedUsers, setSuggestedUsers } = useUsersStore();
-
-  useEffect(() => {
-    console.log(suggestedUsers);
-    setSuggestedUsers();
-  }, [setSuggestedUsers]);
 
   return (
     <div className="hidden lg:block my-4 mx-2">

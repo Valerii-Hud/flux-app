@@ -5,13 +5,8 @@ import { IoNotifications } from 'react-icons/io5';
 import { FaUser } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { BiLogOut } from 'react-icons/bi';
-import useAuthStore from '../../store/useAuthStore';
 
 const Sidebar = () => {
-  const { user, logout } = useAuthStore();
-
-  const handleLogout = () => logout();
-
   return (
     <div className="md:flex-[2_2_0] w-18 max-w-52">
       <div className="sticky top-0 left-0 h-screen flex flex-col border-r border-gray-700 w-20 md:w-full">
