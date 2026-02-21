@@ -6,7 +6,7 @@ import { FaUser } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { BiLogOut } from 'react-icons/bi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiHelper } from '../../utils/helpers/apiHelper';
+import { api } from '../../utils/helpers/api';
 import { successHandler } from '../../utils/handlers/successHandler';
 import { errorHandler } from '../../utils/handlers/errorHandler';
 import type { MouseEvent } from 'react';
@@ -16,7 +16,7 @@ const Sidebar = () => {
   const authUser = queryClient.getQueryData<User>(['authUser']);
 
   const { mutate: logout } = useMutation({
-    mutationFn: () => apiHelper({ endpoint: '/auth/logout' }),
+    mutationFn: () => api({ endpoint: '/auth/logout' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['authUser'] });
       successHandler('Logout successfully');

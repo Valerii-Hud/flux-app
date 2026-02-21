@@ -1,19 +1,19 @@
 import { HttpMethod, type Endpoint, type User } from '../../types';
-import axiosInstance from '../api/axios';
+import axiosInstance from './axios';
 
-interface ApiHelper {
+interface Api {
   endpoint: Endpoint;
   formData?: User;
   method?: HttpMethod;
   apiVersion?: '1' | '2';
 }
 
-export const apiHelper = async ({
+export const api = async ({
   endpoint,
   formData,
   method = HttpMethod.POST,
   apiVersion = '1',
-}: ApiHelper) => {
+}: Api) => {
   try {
     const res = await axiosInstance[method](
       `/api/v${apiVersion}${endpoint}`,

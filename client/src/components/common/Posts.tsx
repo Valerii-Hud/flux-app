@@ -1,7 +1,7 @@
 import Post from './Post';
 import PostSkeleton from '../skeletons/PostSkeleton';
 import { useQuery } from '@tanstack/react-query';
-import { apiHelper } from '../../utils/helpers/apiHelper';
+import { api } from '../../utils/helpers/api';
 import { HttpMethod, type FeedType, type PostType } from '../../types';
 import { useEffect } from 'react';
 
@@ -32,8 +32,7 @@ const Posts = ({ feedType }: PostsProps) => {
     isRefetching,
   } = useQuery({
     queryKey: ['posts'],
-    queryFn: () =>
-      apiHelper({ endpoint: POST_ENDPOINT, method: HttpMethod.GET }),
+    queryFn: () => api({ endpoint: POST_ENDPOINT, method: HttpMethod.GET }),
   });
 
   useEffect(() => {
