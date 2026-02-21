@@ -20,7 +20,7 @@ export const getAllPosts = async (req: AuthRequest, res: Response) => {
         select: '-password',
       });
     if (posts.length === 0) {
-      res.status(200).json([]);
+      return res.status(200).json([]);
     }
 
     res.status(200).json(posts);

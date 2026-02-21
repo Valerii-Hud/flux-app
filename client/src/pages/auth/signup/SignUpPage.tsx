@@ -11,7 +11,7 @@ import { type User } from '../../../types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { errorHandler } from '../../../utils/handlers/errorHandler';
 import { successHandler } from '../../../utils/handlers/successHandler';
-import { authHelper } from '../../../utils/helpers/authHelper';
+import { apiHelper } from '../../../utils/helpers/apiHelper';
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState<User>({
@@ -25,7 +25,7 @@ const SignUpPage = () => {
 
   const { mutate: signup, isPending } = useMutation({
     mutationFn: (formData: User) =>
-      authHelper({ formData, endpoint: 'signup' }),
+      apiHelper({ formData, endpoint: '/auth/signup' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['authUser'] });
       successHandler('Signup successfully');

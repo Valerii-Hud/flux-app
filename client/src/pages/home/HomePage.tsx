@@ -2,9 +2,10 @@ import { useState } from 'react';
 
 import Posts from '../../components/common/Posts.tsx';
 import CreatePost from './CreatePost';
+import type { FeedType } from '../../types/index.ts';
 
 const HomePage = () => {
-  const [feedType, setFeedType] = useState('forYou');
+  const [feedType, setFeedType] = useState<FeedType>('all');
 
   return (
     <>
@@ -14,10 +15,10 @@ const HomePage = () => {
             className={
               'flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 cursor-pointer relative'
             }
-            onClick={() => setFeedType('forYou')}
+            onClick={() => setFeedType('all')}
           >
             For you
-            {feedType === 'forYou' && (
+            {feedType === 'all' && (
               <div className="absolute bottom-0 w-10  h-1 rounded-full bg-primary"></div>
             )}
           </div>
@@ -34,7 +35,7 @@ const HomePage = () => {
 
         <CreatePost />
 
-        <Posts />
+        <Posts feedType={feedType} />
       </div>
     </>
   );

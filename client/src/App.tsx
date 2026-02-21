@@ -7,15 +7,15 @@ import Sidebar from './components/common/Sidebar';
 import NotificationPage from './pages/notification/NotificationPage';
 import ProfilePage from './pages/profile/ProfilePage';
 import { useQuery } from '@tanstack/react-query';
-import { authHelper } from './utils/helpers/authHelper';
+import { apiHelper } from './utils/helpers/apiHelper';
 import { HttpMethod, type User } from './types';
 import LoadingSpinner from './components/common/LoadingSpinner';
 const App = () => {
   const { data: authUser, isLoading } = useQuery<User>({
     queryKey: ['authUser'],
     queryFn: async () => {
-      const res = await authHelper({
-        endpoint: 'check-auth',
+      const res = await apiHelper({
+        endpoint: '/auth/check-auth',
         method: HttpMethod.GET,
       });
       return res || null;

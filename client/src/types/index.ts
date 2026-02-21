@@ -30,9 +30,18 @@ export interface PostType {
   likes: Id[];
 }
 
-export type AuthEndpoint = 'signup' | 'login' | 'logout' | 'check-auth';
+export type Endpoint =
+  | '/auth/signup'
+  | '/auth/login'
+  | '/auth/logout'
+  | '/auth/check-auth'
+  | '/posts/all'
+  | '/posts/following';
+
 export enum HttpMethod {
   POST = 'post',
   GET = 'get',
   PUT = 'put',
 }
+
+export type FeedType = 'all' | 'following';
