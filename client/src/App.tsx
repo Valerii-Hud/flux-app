@@ -7,9 +7,9 @@ import Sidebar from './components/common/Sidebar';
 import NotificationPage from './pages/notification/NotificationPage';
 import ProfilePage from './pages/profile/ProfilePage';
 import { useQuery } from '@tanstack/react-query';
-import { api } from './utils/helpers/api';
 import { HttpMethod, type User } from './types';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import { api } from './utils/api/api';
 const App = () => {
   const { data: authUser, isLoading } = useQuery<User>({
     queryKey: ['authUser'],

@@ -6,11 +6,11 @@ import { FaUser } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { BiLogOut } from 'react-icons/bi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '../../utils/helpers/api';
 import { successHandler } from '../../utils/handlers/successHandler';
 import { errorHandler } from '../../utils/handlers/errorHandler';
 import type { MouseEvent } from 'react';
 import type { User } from '../../types';
+import { api } from '../../utils/api/api';
 const Sidebar = () => {
   const queryClient = useQueryClient();
   const authUser = queryClient.getQueryData<User>(['authUser']);

@@ -1,9 +1,9 @@
 import Post from './Post';
 import PostSkeleton from '../skeletons/PostSkeleton';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '../../utils/helpers/api';
 import { HttpMethod, type FeedType, type PostType } from '../../types';
 import { useEffect } from 'react';
+import { api } from '../../utils/api/api';
 
 interface PostsProps {
   feedType: FeedType;
