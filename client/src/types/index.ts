@@ -23,23 +23,28 @@ export interface Comment {
 }
 
 export interface PostType {
-  _id: Id;
-  user: User;
+  _id?: Id;
+  user?: User;
   text?: string;
   image?: string;
   comments?: Comment[];
-  likes: Id[];
+  likes?: Id[];
 }
 
 type StaticEndpoint =
+  // [Auth]
   | '/auth/signup'
   | '/auth/login'
   | '/auth/logout'
   | '/auth/check-auth'
+  // [Posts]
   | '/posts/all'
-  | '/posts/following';
+  | '/posts/create'
+  | '/posts/following'
+  // [Users]
+  | '/users/suggested';
 
-type DynamicEndpoint = `/posts/${string}`;
+type DynamicEndpoint = `/posts/${string}` | `/users/follow/${string}`;
 
 export type Endpoint = StaticEndpoint | DynamicEndpoint;
 

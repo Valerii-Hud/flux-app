@@ -6,7 +6,7 @@ import { FaTrash } from 'react-icons/fa';
 import { useState, type SyntheticEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { HttpMethod, type PostType, type User } from '../../types';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../utils/api/api';
 import { successHandler } from '../../utils/handlers/successHandler';
 import { errorHandler } from '../../utils/handlers/errorHandler';
@@ -14,9 +14,7 @@ import LoadingSpinner from './LoadingSpinner';
 
 const Post = ({ post }: { post: PostType }) => {
   const queryClient = useQueryClient();
-  const { data: authUser } = useQuery<User>({
-    queryKey: ['authUser'],
-  });
+  const authUser = queryClient.getQueryData<User>(['authUser']);
 
   const { mutate: deletePost, isPending } = useMutation({
     mutationFn: (postId: string) =>
@@ -32,16 +30,17 @@ const Post = ({ post }: { post: PostType }) => {
 
   const [comment, setComment] = useState('');
   const postOwner = post.user;
-  const isLiked = authUser?.likedPosts?.includes(post._id);
+  const isLiked =
+    typeof post._id === 'string' && authUser?.likedPosts?.includes(post._id);
 
-  const isMyPost = authUser?._id === post.user._id;
+  const isMyPost = authUser?._id === post.user?._id;
 
   const formattedDate = '1h';
 
   const isCommenting = false;
 
   const handleDeletePost = () => {
-    deletePost(post._id);
+    if (typeof post._id === 'string') deletePost(post._id);
   };
 
   const handlePostComment = (
@@ -57,20 +56,20 @@ const Post = ({ post }: { post: PostType }) => {
       <div className="flex gap-2 items-start p-4 border-b border-gray-700">
         <div className="avatar">
           <Link
-            to={`/profile/${postOwner.userName}`}
+            to={`/profile/${postOwner?.userName}`}
             className="w-8 rounded-full overflow-hidden"
           >
-            <img src={postOwner.profileImage || '/avatar-placeholder.png'} />
+            <img src={postOwner?.profileImage || '/avatar-placeholder.png'} />
           </Link>
         </div>
         <div className="flex flex-col flex-1">
           <div className="flex gap-2 items-center">
-            <Link to={`/profile/${postOwner.userName}`} className="font-bold">
-              {postOwner.fullName}
+            <Link to={`/profile/${postOwner?.userName}`} className="font-bold">
+              {postOwner?.fullName}
             </Link>
             <span className="text-gray-700 flex gap-1 text-sm">
-              <Link to={`/profile/${postOwner.userName}`}>
-                @{postOwner.userName}
+              <Link to={`/profile/${postOwner?.userName}`}>
+                @{postOwner?.userName}
               </Link>
               <span>·</span>
               <span>{formattedDate}</span>
@@ -204,7 +203,7 @@ const Post = ({ post }: { post: PostType }) => {
                     isLiked ? 'text-pink-500' : ''
                   }`}
                 >
-                  {post.likes.length}
+                  {post.likes?.length}
                 </span>
               </div>
             </div>

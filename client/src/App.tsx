@@ -7,7 +7,7 @@ import Sidebar from './components/common/Sidebar';
 import NotificationPage from './pages/notification/NotificationPage';
 import ProfilePage from './pages/profile/ProfilePage';
 import { useQuery } from '@tanstack/react-query';
-import { HttpMethod, type User } from './types';
+import { type User } from './types';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import { api } from './utils/api/api';
 const App = () => {
@@ -16,7 +16,7 @@ const App = () => {
     queryFn: async () => {
       const res = await api({
         endpoint: '/auth/check-auth',
-        method: HttpMethod.GET,
+        showFailMessage: false,
       });
       return res || null;
     },

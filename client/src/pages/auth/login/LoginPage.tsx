@@ -5,7 +5,7 @@ import XSvg from '../../../components/svgs/X';
 
 import { MdOutlineMail } from 'react-icons/md';
 import { MdPassword } from 'react-icons/md';
-import { type User } from '../../../types';
+import { HttpMethod, type User } from '../../../types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { errorHandler } from '../../../utils/handlers/errorHandler';
 import { successHandler } from '../../../utils/handlers/successHandler';
@@ -18,7 +18,8 @@ const LoginPage = () => {
   });
   const queryClient = useQueryClient();
   const { mutate: login, isPending } = useMutation({
-    mutationFn: (formData: User) => api({ formData, endpoint: '/auth/login' }),
+    mutationFn: (formData: User) =>
+      api({ data: formData, endpoint: '/auth/login', method: HttpMethod.POST }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['authUser'] });
       successHandler('Login successfully');

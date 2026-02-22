@@ -9,14 +9,15 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { successHandler } from '../../utils/handlers/successHandler';
 import { errorHandler } from '../../utils/handlers/errorHandler';
 import type { MouseEvent } from 'react';
-import type { User } from '../../types';
+import { HttpMethod, type User } from '../../types';
 import { api } from '../../utils/api/api';
 const Sidebar = () => {
   const queryClient = useQueryClient();
   const authUser = queryClient.getQueryData<User>(['authUser']);
 
   const { mutate: logout } = useMutation({
-    mutationFn: () => api({ endpoint: '/auth/logout' }),
+    mutationFn: () =>
+      api({ endpoint: '/auth/logout', method: HttpMethod.POST }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['authUser'] });
       successHandler('Logout successfully');

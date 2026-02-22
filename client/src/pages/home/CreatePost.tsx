@@ -2,23 +2,42 @@ import { CiImageOn } from 'react-icons/ci';
 import { BsEmojiSmileFill } from 'react-icons/bs';
 import { useRef, useState, type ChangeEvent, type SyntheticEvent } from 'react';
 import { IoCloseSharp } from 'react-icons/io5';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { User } from '../../types';
+import { api } from '../../utils/api/api';
+import { successHandler } from '../../utils/handlers/successHandler';
+import { errorHandler } from '../../utils/handlers/errorHandler';
+import toast from 'react-hot-toast';
 
 const CreatePost = () => {
-  const [text, setText] = useState('');
-  const [img, setImg] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const authUser = queryClient.getQueryData<User>(['authUser']);
+
+  const {
+    mutate: createPost,
+    isPending,
+    isError,
+  } = useMutation({
+    mutationFn: (postData: { text: string; image: string }) =>
+      api({ data: postData, endpoint: '/posts/create' }),
+    onSuccess: () => {
+      setText('');
+      setImage('');
+      successHandler('Post created successfully');
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    },
+    onError: (error) => errorHandler(error),
+  });
+
+  const [text, setText] = useState<string>('');
+  const [image, setImage] = useState<string>('');
 
   const imgRef = useRef<HTMLInputElement | null>(null);
 
-  const isPending = false;
-  const isError = false;
-
-  const data = {
-    profileImage: '/avatars/boy1.png',
-  };
-
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
     e.preventDefault();
-    alert('Post created successfully');
+    if (!text && !image) return toast.error('Please provide image or text');
+    createPost({ text, image });
   };
 
   const handleImgChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -28,7 +47,7 @@ const CreatePost = () => {
       if (file) {
         const reader = new FileReader();
         reader.onload = () => {
-          if (typeof reader.result === 'string') setImg(reader.result);
+          if (typeof reader.result === 'string') setImage(reader.result);
         };
         reader.readAsDataURL(file);
       }
@@ -39,7 +58,7 @@ const CreatePost = () => {
     <div className="flex p-4 items-start gap-4 border-b border-gray-700">
       <div className="avatar">
         <div className="w-8 rounded-full">
-          <img src={data.profileImage || '/avatar-placeholder.png'} />
+          <img src={authUser?.profileImage || '/avatar-placeholder.png'} />
         </div>
       </div>
       <form className="flex flex-col gap-2 w-full" onSubmit={handleSubmit}>
@@ -49,17 +68,17 @@ const CreatePost = () => {
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
-        {img && (
+        {image && (
           <div className="relative w-72 mx-auto">
             <IoCloseSharp
               className="absolute top-0 right-0 text-white bg-gray-800 rounded-full w-5 h-5 cursor-pointer"
               onClick={() => {
-                setImg(null);
+                setImage('');
                 if (imgRef.current) imgRef.current.value = '';
               }}
             />
             <img
-              src={img}
+              src={image}
               className="w-full mx-auto h-72 object-contain rounded"
             />
           </div>

@@ -1,27 +1,42 @@
-import { HttpMethod, type Endpoint, type User } from '../../types';
+import {
+  HttpMethod,
+  type Endpoint,
+  type PostType,
+  type User,
+} from '../../types';
 import axiosInstance from './axios';
+import { errorHandler } from '../handlers/errorHandler';
+import { successHandler } from '../handlers/successHandler';
 
 interface Api {
   endpoint: Endpoint;
-  formData?: User;
+  data?: User | PostType;
   method?: HttpMethod;
+  showSuccessMessage?: boolean;
+  showFailMessage?: boolean;
+  successMessage?: string;
   apiVersion?: '1' | '2';
 }
 
 export const api = async ({
   endpoint,
-  formData,
-  method = HttpMethod.POST,
+  data,
+  successMessage,
+  method = HttpMethod.GET,
+  showSuccessMessage = true,
+  showFailMessage = true,
   apiVersion = '1',
 }: Api) => {
   try {
     const res = await axiosInstance[method](
       `/api/v${apiVersion}${endpoint}`,
-      formData ? formData : undefined
+      data ? data : undefined
     );
+    if (showSuccessMessage && successMessage) {
+      successHandler(successMessage);
+    }
     return res.data;
   } catch (error) {
-    if (error instanceof Error) console.error(error.message);
-    return null;
+    if (showFailMessage) errorHandler(error);
   }
 };

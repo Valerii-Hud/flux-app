@@ -7,10 +7,9 @@ import { MdOutlineMail } from 'react-icons/md';
 import { FaUser } from 'react-icons/fa';
 import { MdPassword } from 'react-icons/md';
 import { MdDriveFileRenameOutline } from 'react-icons/md';
-import { type User } from '../../../types';
+import { HttpMethod, type User } from '../../../types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { errorHandler } from '../../../utils/handlers/errorHandler';
-import { successHandler } from '../../../utils/handlers/successHandler';
+
 import { api } from '../../../utils/api/api';
 
 const SignUpPage = () => {
@@ -24,12 +23,16 @@ const SignUpPage = () => {
   const queryClient = useQueryClient();
 
   const { mutate: signup, isPending } = useMutation({
-    mutationFn: (formData: User) => api({ formData, endpoint: '/auth/signup' }),
+    mutationFn: (formData: User) =>
+      api({
+        data: formData,
+        endpoint: '/auth/signup',
+        method: HttpMethod.POST,
+        successMessage: 'Signup successfully',
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['authUser'] });
-      successHandler('Signup successfully');
     },
-    onError: (error) => errorHandler(error),
   });
 
   const handleSubmit = (
