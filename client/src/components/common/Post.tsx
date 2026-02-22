@@ -5,20 +5,44 @@ import { FaRegBookmark } from 'react-icons/fa6';
 import { FaTrash } from 'react-icons/fa';
 import { useState, type SyntheticEvent } from 'react';
 import { Link } from 'react-router-dom';
-import type { PostType } from '../../types';
+import { HttpMethod, type PostType, type User } from '../../types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { api } from '../../utils/api/api';
+import { successHandler } from '../../utils/handlers/successHandler';
+import { errorHandler } from '../../utils/handlers/errorHandler';
+import LoadingSpinner from './LoadingSpinner';
 
 const Post = ({ post }: { post: PostType }) => {
+  const queryClient = useQueryClient();
+  const { data: authUser } = useQuery<User>({
+    queryKey: ['authUser'],
+  });
+
+  const { mutate: deletePost, isPending } = useMutation({
+    mutationFn: (postId: string) =>
+      api({ endpoint: `/posts/${postId}`, method: HttpMethod.DELETE }),
+    onSuccess: () => {
+      successHandler('Post deleted successfully');
+      queryClient.invalidateQueries({
+        queryKey: ['posts'],
+      });
+    },
+    onError: (error) => errorHandler(error),
+  });
+
   const [comment, setComment] = useState('');
   const postOwner = post.user;
-  const isLiked = false;
+  const isLiked = authUser?.likedPosts?.includes(post._id);
 
-  const isMyPost = true;
+  const isMyPost = authUser?._id === post.user._id;
 
   const formattedDate = '1h';
 
   const isCommenting = false;
 
-  const handleDeletePost = () => {};
+  const handleDeletePost = () => {
+    deletePost(post._id);
+  };
 
   const handlePostComment = (
     e: SyntheticEvent<HTMLFormElement, SubmitEvent>
@@ -53,10 +77,14 @@ const Post = ({ post }: { post: PostType }) => {
             </span>
             {isMyPost && (
               <span className="flex justify-end flex-1">
-                <FaTrash
-                  className="cursor-pointer hover:text-red-500"
-                  onClick={handleDeletePost}
-                />
+                {isPending ? (
+                  <LoadingSpinner />
+                ) : (
+                  <FaTrash
+                    className="cursor-pointer hover:text-red-500"
+                    onClick={handleDeletePost}
+                  />
+                )}
               </span>
             )}
           </div>

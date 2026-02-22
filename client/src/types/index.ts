@@ -13,6 +13,7 @@ export interface User {
   link?: string;
   followers?: Id[] | User[];
   following?: Id[] | User[];
+  likedPosts?: Id[];
 }
 
 export interface Comment {
@@ -30,7 +31,7 @@ export interface PostType {
   likes: Id[];
 }
 
-export type Endpoint =
+type StaticEndpoint =
   | '/auth/signup'
   | '/auth/login'
   | '/auth/logout'
@@ -38,10 +39,15 @@ export type Endpoint =
   | '/posts/all'
   | '/posts/following';
 
+type DynamicEndpoint = `/posts/${string}`;
+
+export type Endpoint = StaticEndpoint | DynamicEndpoint;
+
 export enum HttpMethod {
   POST = 'post',
   GET = 'get',
   PUT = 'put',
+  DELETE = 'delete',
 }
 
 export type FeedType = 'all' | 'following';
