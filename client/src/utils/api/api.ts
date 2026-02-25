@@ -33,7 +33,7 @@ export const api = async ({
       data ? data : undefined
     );
     if (showSuccessMessage && successMessage) {
-      successHandler(successMessage);
+      successHandler(res.data.message || successMessage);
     }
     return res.data;
   } catch (error) {

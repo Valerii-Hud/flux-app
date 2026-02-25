@@ -1,34 +1,19 @@
 import { Link } from 'react-router-dom';
 import RightPanelSkeleton from '../skeletons/RightPanelSkeleton';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../../utils/api/api';
-import { HttpMethod, type User } from '../../types';
+import { type User } from '../../types';
 import type { MouseEvent } from 'react';
+import useFollow from '../../hooks/useFollow';
+import LoadingSpinner from './LoadingSpinner';
 
 const RightPanel = () => {
-  const queryClient = useQueryClient();
   const { data: usersForRightPanel, isLoading } = useQuery<User[]>({
     queryKey: ['usersForRightPanel'],
     queryFn: () => api({ endpoint: '/users/suggested' }),
   });
 
-  const { mutate: followUnfollowUser, isPending } = useMutation({
-    mutationFn: async ({
-      userId,
-      userName,
-    }: {
-      userId: string;
-      userName: string;
-    }) =>
-      await api({
-        endpoint: `/users/follow/${userId}`,
-        method: HttpMethod.POST,
-        successMessage: `@${userName} followed successfully`,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['usersForRightPanel'] });
-    },
-  });
+  const { followUnfollowUser, isPending } = useFollow();
 
   const handleFollowUnfollowUser = (
     event: MouseEvent,
@@ -38,6 +23,9 @@ const RightPanel = () => {
     event.preventDefault();
     if (userId && userName) followUnfollowUser({ userId, userName });
   };
+
+  if (!usersForRightPanel || usersForRightPanel?.length === 0)
+    return <div className="md:w-64 w-0"></div>;
 
   return (
     <div className="hidden lg:block my-4 mx-2">
@@ -84,7 +72,7 @@ const RightPanel = () => {
                       handleFollowUnfollowUser(e, user?._id, user?.userName)
                     }
                   >
-                    Follow
+                    {isPending ? <LoadingSpinner size="sm" /> : 'Follow'}
                   </button>
                 </div>
               </Link>

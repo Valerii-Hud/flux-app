@@ -1,9 +1,14 @@
 export type Id = string;
 
-export interface User {
-  email: string;
-  password: string;
+interface MongooseTypes {
   _id?: Id;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface User extends MongooseTypes {
+  email?: string;
+  password?: string;
   userName?: string;
   fullName?: string;
   profileImage?: string;
@@ -16,19 +21,30 @@ export interface User {
   likedPosts?: Id[];
 }
 
-export interface Comment {
-  _id?: Id;
+export interface Comment extends MongooseTypes {
   text: string;
   user?: User;
 }
 
-export interface PostType {
-  _id?: Id;
+export interface PostType extends MongooseTypes {
   user?: User;
   text?: string;
   image?: string;
   comments?: Comment[];
   likes?: Id[];
+}
+
+export interface Notification extends MongooseTypes {
+  from: User;
+  to: User;
+  type: NotificationType;
+  read: boolean;
+}
+
+export enum NotificationType {
+  follow = 'follow',
+  like = 'like',
+  comment = 'comment',
 }
 
 type StaticEndpoint =
@@ -42,7 +58,9 @@ type StaticEndpoint =
   | '/posts/create'
   | '/posts/following'
   // [Users]
-  | '/users/suggested';
+  | '/users/suggested'
+  // [Notifications]
+  | '/notifications/all';
 
 type DynamicEndpoint = `/posts/${string}` | `/users/follow/${string}`;
 

@@ -11,6 +11,8 @@ export const getAllNotifications = async (req: AuthRequest, res: Response) => {
       path: 'from',
       select: 'userName profileImage',
     });
+    if (!notifications) res.status(200).json([]);
+
     await Notification.updateMany({ to: userId }, { read: true });
     res.status(200).json(notifications);
   } catch (error) {
@@ -29,8 +31,12 @@ export const deleteAllNotifications = async (
 ) => {
   try {
     const userId = req.user?._id;
-    await Notification.deleteMany({ to: userId });
+    const notifications = await Notification.find({ to: userId });
 
+    if (notifications.length === 0) {
+      return res.status(200).json({ message: 'No notifications to delete' });
+    }
+    await Notification.deleteMany({ to: userId });
     res.status(200).json({ message: 'Notifications deleted successfully' });
   } catch (error) {
     isError({

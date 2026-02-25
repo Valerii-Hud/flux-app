@@ -4,32 +4,27 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { FaUser } from 'react-icons/fa';
 import { FaHeart } from 'react-icons/fa6';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { api } from '../../utils/api/api';
+import { HttpMethod, type Notification } from '../../types';
 
 const NotificationPage = () => {
-  const isLoading = false;
-  const notifications = [
-    {
-      _id: '1',
-      from: {
-        _id: '1',
-        userName: 'johndoe',
-        profileImage: '/avatars/boy2.png',
-      },
-      type: 'follow',
-    },
-    {
-      _id: '2',
-      from: {
-        _id: '2',
-        userName: 'janedoe',
-        profileImage: '/avatars/girl1.png',
-      },
-      type: 'like',
-    },
-  ];
+  const { data: notifications, isLoading } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: () => api({ endpoint: '/notifications/all' }),
+  });
+
+  const { mutate: deletePost } = useMutation({
+    mutationFn: () =>
+      api({
+        endpoint: '/notifications/all',
+        method: HttpMethod.DELETE,
+        successMessage: 'All notifications deleted',
+      }),
+  });
 
   const deleteNotifications = () => {
-    alert('All notifications deleted');
+    deletePost();
   };
 
   return (
@@ -59,38 +54,39 @@ const NotificationPage = () => {
         {notifications?.length === 0 && (
           <div className="text-center p-4 font-bold">No notifications 🤔</div>
         )}
-        {notifications?.map((notification) => (
-          <div className="border-b border-gray-700" key={notification._id}>
-            <div className="flex gap-2 p-4">
-              {notification.type === 'follow' && (
-                <FaUser className="w-7 h-7 text-primary" />
-              )}
-              {notification.type === 'like' && (
-                <FaHeart className="w-7 h-7 text-red-500" />
-              )}
-              <Link to={`/profile/${notification.from.userName}`}>
-                <div className="avatar">
-                  <div className="w-8 rounded-full">
-                    <img
-                      src={
-                        notification.from.profileImage ||
-                        '/avatar-placeholder.png'
-                      }
-                    />
+        {notifications &&
+          notifications?.map((notification: Notification) => (
+            <div className="border-b border-gray-700" key={notification._id}>
+              <div className="flex gap-2 p-4">
+                {notification.type === 'follow' && (
+                  <FaUser className="w-7 h-7 text-primary" />
+                )}
+                {notification.type === 'like' && (
+                  <FaHeart className="w-7 h-7 text-red-500" />
+                )}
+                <Link to={`/profile/${notification.from.userName}`}>
+                  <div className="avatar">
+                    <div className="w-8 rounded-full">
+                      <img
+                        src={
+                          notification.from.profileImage ||
+                          '/avatar-placeholder.png'
+                        }
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="flex gap-1">
-                  <span className="font-bold">
-                    @{notification.from.userName}
-                  </span>{' '}
-                  {notification.type === 'follow'
-                    ? 'followed you'
-                    : 'liked your post'}
-                </div>
-              </Link>
+                  <div className="flex gap-1">
+                    <span className="font-bold">
+                      @{notification.from.userName}
+                    </span>{' '}
+                    {notification.type === 'follow'
+                      ? 'followed you'
+                      : 'liked your post'}
+                  </div>
+                </Link>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
     </>
   );

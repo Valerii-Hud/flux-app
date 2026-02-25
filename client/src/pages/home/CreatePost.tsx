@@ -3,10 +3,8 @@ import { BsEmojiSmileFill } from 'react-icons/bs';
 import { useRef, useState, type ChangeEvent, type SyntheticEvent } from 'react';
 import { IoCloseSharp } from 'react-icons/io5';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { User } from '../../types';
+import { HttpMethod, type User } from '../../types';
 import { api } from '../../utils/api/api';
-import { successHandler } from '../../utils/handlers/successHandler';
-import { errorHandler } from '../../utils/handlers/errorHandler';
 import toast from 'react-hot-toast';
 
 const CreatePost = () => {
@@ -19,14 +17,17 @@ const CreatePost = () => {
     isError,
   } = useMutation({
     mutationFn: (postData: { text: string; image: string }) =>
-      api({ data: postData, endpoint: '/posts/create' }),
+      api({
+        data: postData,
+        endpoint: '/posts/create',
+        successMessage: 'Post created successfully',
+        method: HttpMethod.POST,
+      }),
     onSuccess: () => {
       setText('');
       setImage('');
-      successHandler('Post created successfully');
       queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
-    onError: (error) => errorHandler(error),
   });
 
   const [text, setText] = useState<string>('');

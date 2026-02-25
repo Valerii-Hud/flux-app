@@ -1,7 +1,6 @@
 import { useRef, useState, type ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
 
-import Posts from '../../components/common/Posts';
 import ProfileHeaderSkeleton from '../../components/skeletons/ProfileHeaderSkeleton';
 import EditProfileModal from './EditProfileModal';
 
@@ -12,29 +11,22 @@ import { IoCalendarOutline } from 'react-icons/io5';
 import { FaLink } from 'react-icons/fa';
 import { MdEdit } from 'react-icons/md';
 import type { User } from '../../types';
+import { useQueryClient } from '@tanstack/react-query';
+import { formatDate } from '../../utils/lib/formatDate';
 
 const ProfilePage = () => {
-  const [coverImage, setcoverImage] = useState<string | null>(null);
-  const [profileImage, setprofileImage] = useState<string | null>(null);
+  const [coverImage, setCoverImage] = useState<string | null>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   const [feedType, setFeedType] = useState('posts');
 
+  const queryClient = useQueryClient();
   const coverImageRef = useRef<HTMLInputElement | null>(null);
   const profileImageRef = useRef<HTMLInputElement | null>(null);
 
   const isLoading = false;
   const isMyProfile = true;
 
-  const user: User = {
-    _id: '1',
-    fullName: 'John Doe',
-    userName: 'johndoe',
-    profileImage: '/avatars/boy2.png',
-    coverImage: '/cover.png',
-    bio: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    link: 'https://youtube.com/@asaprogrammer_',
-    following: ['1', '2', '3'],
-    followers: ['1', '2', '3'],
-  };
+  const user = queryClient.getQueryData<User>(['authUser']);
 
   const handleImgChange = (e: ChangeEvent<HTMLInputElement>, state: string) => {
     const files = e.target.files;
@@ -46,10 +38,10 @@ const ProfilePage = () => {
           if (typeof reader.result === 'string') {
             switch (state) {
               case 'coverImage':
-                setcoverImage(reader.result);
+                setCoverImage(reader.result);
                 break;
               case 'profileImage':
-                setprofileImage(reader.result);
+                setProfileImage(reader.result);
                 break;
             }
           }
@@ -170,7 +162,7 @@ const ProfilePage = () => {
                           rel="noreferrer"
                           className="text-sm text-blue-500 hover:underline"
                         >
-                          youtube.com/@mrbeast
+                          {user.link}
                         </a>
                       </>
                     </div>
@@ -178,7 +170,7 @@ const ProfilePage = () => {
                   <div className="flex gap-2 items-center">
                     <IoCalendarOutline className="w-4 h-4 text-slate-500" />
                     <span className="text-sm text-slate-500">
-                      Joined July 2021
+                      {formatDate(user.createdAt, 'full')}
                     </span>
                   </div>
                 </div>
@@ -220,7 +212,7 @@ const ProfilePage = () => {
             </>
           )}
 
-          <Posts />
+          {/* <Posts feedType={feedType} /> */}
         </div>
       </div>
     </>

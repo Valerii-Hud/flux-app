@@ -8,8 +8,6 @@ import { Link } from 'react-router-dom';
 import { HttpMethod, type PostType, type User } from '../../types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../utils/api/api';
-import { successHandler } from '../../utils/handlers/successHandler';
-import { errorHandler } from '../../utils/handlers/errorHandler';
 import LoadingSpinner from './LoadingSpinner';
 
 const Post = ({ post }: { post: PostType }) => {
@@ -18,14 +16,16 @@ const Post = ({ post }: { post: PostType }) => {
 
   const { mutate: deletePost, isPending } = useMutation({
     mutationFn: (postId: string) =>
-      api({ endpoint: `/posts/${postId}`, method: HttpMethod.DELETE }),
+      api({
+        endpoint: `/posts/${postId}`,
+        method: HttpMethod.DELETE,
+        successMessage: 'Post deleted successfully',
+      }),
     onSuccess: () => {
-      successHandler('Post deleted successfully');
       queryClient.invalidateQueries({
         queryKey: ['posts'],
       });
     },
-    onError: (error) => errorHandler(error),
   });
 
   const [comment, setComment] = useState('');
