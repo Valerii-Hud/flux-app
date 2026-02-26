@@ -26,6 +26,7 @@ export const getUserProfile = async (req: AuthRequest, res: Response) => {
     responseWithError(res);
   }
 };
+
 export const getSuggestedUsers = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?._id;

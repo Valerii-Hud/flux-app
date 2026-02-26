@@ -57,6 +57,7 @@ type StaticEndpoint =
   | '/posts/all'
   | '/posts/create'
   | '/posts/following'
+
   // [Users]
   | '/users/suggested'
   // [Notifications]

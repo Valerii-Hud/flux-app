@@ -167,14 +167,12 @@ export const likeUnlikePost = async (req: AuthRequest, res: Response) => {
     }
     if (userId) {
       const userLikedPost = post.likes.includes(userId);
-
       if (userLikedPost) {
         await Post.updateOne({ _id: postId }, { $pull: { likes: userId } });
         await User.updateOne(
           { _id: userId },
           { $pull: { likedPosts: postId } }
         );
-        res.status(200).json({ message: 'Post unliked successfully' });
       } else {
         await Post.updateOne({ _id: postId }, { $push: { likes: userId } });
         await User.updateOne(
@@ -189,9 +187,12 @@ export const likeUnlikePost = async (req: AuthRequest, res: Response) => {
           type: 'like',
         });
         await notification.save();
-
-        res.status(200).json({ message: 'Post liked successfully' });
+        const updatedLikes = post.likes.filter(
+          (postId) => postId.toString() !== userId.toString()
+        );
       }
+      const updatedPost = await Post.findById(postId);
+      return res.status(200).json(updatedPost?.likes);
     }
   } catch (error) {
     isError({

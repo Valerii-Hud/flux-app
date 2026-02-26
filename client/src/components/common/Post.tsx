@@ -6,15 +6,15 @@ import { FaTrash } from 'react-icons/fa';
 import { useState, type SyntheticEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { HttpMethod, type PostType, type User } from '../../types';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../utils/api/api';
 import LoadingSpinner from './LoadingSpinner';
 
 const Post = ({ post }: { post: PostType }) => {
   const queryClient = useQueryClient();
-  const authUser = queryClient.getQueryData<User>(['authUser']);
+  const { data: authUser } = useQuery<User>({ queryKey: ['authUser'] });
 
-  const { mutate: deletePost, isPending } = useMutation({
+  const { mutate: deletePost, isPending: isPendingDeletePost } = useMutation({
     mutationFn: (postId: string) =>
       api({
         endpoint: `/posts/${postId}`,
@@ -28,16 +28,49 @@ const Post = ({ post }: { post: PostType }) => {
     },
   });
 
+  const { mutate: likePost, isPending: isPendingLikePost } = useMutation({
+    mutationFn: (postId: string) =>
+      api({
+        endpoint: `/posts/like/${postId}`,
+        method: HttpMethod.POST,
+      }),
+
+    onSuccess: (updatedLikes) => {
+      queryClient.setQueryData(['posts'], (oldPosts: PostType[]) => {
+        if (!oldPosts) return [];
+
+        return oldPosts.map((p) =>
+          p._id === post._id ? { ...p, likes: updatedLikes } : p
+        );
+      });
+      queryClient.invalidateQueries({ queryKey: ['authUser'] });
+    },
+  });
+
+  const { mutate: commentPost, isPending: isPendingCommentPost } = useMutation({
+    mutationFn: (postId: string) =>
+      api({
+        endpoint: `/posts/comment/${postId}`,
+        method: HttpMethod.POST,
+        data: {
+          text: comment,
+        },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['posts'],
+      });
+    },
+  });
+
   const [comment, setComment] = useState('');
   const postOwner = post.user;
-  const isLiked =
-    typeof post._id === 'string' && authUser?.likedPosts?.includes(post._id);
-
+  const isLiked = authUser?.likedPosts?.some(
+    (id) => id.toString() === post._id?.toString()
+  );
   const isMyPost = authUser?._id === post.user?._id;
 
   const formattedDate = '1h';
-
-  const isCommenting = false;
 
   const handleDeletePost = () => {
     if (typeof post._id === 'string') deletePost(post._id);
@@ -47,9 +80,12 @@ const Post = ({ post }: { post: PostType }) => {
     e: SyntheticEvent<HTMLFormElement, SubmitEvent>
   ) => {
     e.preventDefault();
+    if (post._id) commentPost(post._id);
   };
 
-  const handleLikePost = () => {};
+  const handleLikePost = () => {
+    if (typeof post._id === 'string') likePost(post._id);
+  };
 
   return (
     <>
@@ -76,7 +112,7 @@ const Post = ({ post }: { post: PostType }) => {
             </span>
             {isMyPost && (
               <span className="flex justify-end flex-1">
-                {isPending ? (
+                {isPendingDeletePost ? (
                   <LoadingSpinner />
                 ) : (
                   <FaTrash
@@ -123,12 +159,13 @@ const Post = ({ post }: { post: PostType }) => {
                 <div className="modal-box rounded border border-gray-600">
                   <h3 className="font-bold text-lg mb-4">COMMENTS</h3>
                   <div className="flex flex-col gap-3 max-h-60 overflow-auto">
-                    {post.comments?.length === 0 && (
+                    {!isPendingCommentPost && post.comments?.length === 0 && (
                       <p className="text-sm text-slate-500">
                         No comments yet 🤔 Be the first one 😉
                       </p>
                     )}
-                    {post.comments &&
+                    {!isPendingCommentPost &&
+                      post.comments &&
                       post.comments.map((comment) => (
                         <div
                           key={comment._id}
@@ -169,7 +206,7 @@ const Post = ({ post }: { post: PostType }) => {
                       onChange={(e) => setComment(e.target.value)}
                     />
                     <button className="btn btn-primary rounded-full btn-sm text-white px-4">
-                      {isCommenting ? (
+                      {isPendingCommentPost ? (
                         <span className="loading loading-spinner loading-md"></span>
                       ) : (
                         'Post'
@@ -191,10 +228,11 @@ const Post = ({ post }: { post: PostType }) => {
                 className="flex gap-1 items-center group cursor-pointer"
                 onClick={handleLikePost}
               >
-                {!isLiked && (
+                {isPendingLikePost && <LoadingSpinner size="sm" />}
+                {!isLiked && !isPendingLikePost && (
                   <FaRegHeart className="w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500" />
                 )}
-                {isLiked && (
+                {isLiked && !isPendingLikePost && (
                   <FaRegHeart className="w-4 h-4 cursor-pointer text-pink-500 " />
                 )}
 
@@ -203,7 +241,7 @@ const Post = ({ post }: { post: PostType }) => {
                     isLiked ? 'text-pink-500' : ''
                   }`}
                 >
-                  {post.likes?.length}
+                  {isPendingLikePost ? '' : post.likes?.length}
                 </span>
               </div>
             </div>

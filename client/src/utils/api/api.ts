@@ -1,5 +1,6 @@
 import {
   HttpMethod,
+  type Comment,
   type Endpoint,
   type PostType,
   type User,
@@ -10,7 +11,7 @@ import { successHandler } from '../handlers/successHandler';
 
 interface Api {
   endpoint: Endpoint;
-  data?: User | PostType;
+  data?: User | PostType | Comment | string;
   method?: HttpMethod;
   showSuccessMessage?: boolean;
   showFailMessage?: boolean;
