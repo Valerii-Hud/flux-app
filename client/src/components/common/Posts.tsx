@@ -1,15 +1,22 @@
 import Post from './Post';
 import PostSkeleton from '../skeletons/PostSkeleton';
 import { useQuery } from '@tanstack/react-query';
-import { HttpMethod, type FeedType, type PostType } from '../../types';
+import {
+  HttpMethod,
+  type Endpoint,
+  type FeedType,
+  type PostType,
+} from '../../types';
 import { useEffect } from 'react';
 import { api } from '../../utils/api/api';
 
 interface PostsProps {
   feedType: FeedType;
+  userName: string | undefined;
+  userId: string;
 }
 
-const Posts = ({ feedType }: PostsProps) => {
+const Posts = ({ feedType, userName, userId }: PostsProps) => {
   const getPostEndpoint = () => {
     const ALL_POSTS = '/posts/all';
     const FOLLOWING_POSTS = '/posts/following';
@@ -18,6 +25,12 @@ const Posts = ({ feedType }: PostsProps) => {
         return ALL_POSTS;
       case 'following':
         return FOLLOWING_POSTS;
+      case 'posts':
+        if (!userName) throw new Error('User Not Found');
+        return `/posts/user/${userName}` as Endpoint;
+      case 'likes':
+        if (!userName) throw new Error('User Not Found');
+        return `/posts/likes/${userId}` as Endpoint;
       default:
         return ALL_POSTS;
     }
@@ -37,7 +50,7 @@ const Posts = ({ feedType }: PostsProps) => {
 
   useEffect(() => {
     refetchPosts();
-  }, [feedType, refetchPosts]);
+  }, [feedType, refetchPosts, userName]);
 
   return (
     <>

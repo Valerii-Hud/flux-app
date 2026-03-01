@@ -9,6 +9,7 @@ import { HttpMethod, type PostType, type User } from '../../types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../utils/api/api';
 import LoadingSpinner from './LoadingSpinner';
+import { formatPostDate } from '../../utils/lib/formatDate';
 
 const Post = ({ post }: { post: PostType }) => {
   const queryClient = useQueryClient();
@@ -57,6 +58,7 @@ const Post = ({ post }: { post: PostType }) => {
         },
       }),
     onSuccess: () => {
+      setComment('');
       queryClient.invalidateQueries({
         queryKey: ['posts'],
       });
@@ -70,9 +72,11 @@ const Post = ({ post }: { post: PostType }) => {
   );
   const isMyPost = authUser?._id === post.user?._id;
 
-  const formattedDate = '1h';
+  if (!post.createdAt) return;
+  const formattedDate = formatPostDate(post.createdAt);
 
   const handleDeletePost = () => {
+    if (isPendingDeletePost) return;
     if (typeof post._id === 'string') deletePost(post._id);
   };
 
@@ -80,10 +84,12 @@ const Post = ({ post }: { post: PostType }) => {
     e: SyntheticEvent<HTMLFormElement, SubmitEvent>
   ) => {
     e.preventDefault();
+    if (isPendingCommentPost) return;
     if (post._id) commentPost(post._id);
   };
 
   const handleLikePost = () => {
+    if (isPendingLikePost) return;
     if (typeof post._id === 'string') likePost(post._id);
   };
 

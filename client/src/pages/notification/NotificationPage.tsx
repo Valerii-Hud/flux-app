@@ -4,11 +4,12 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { FaUser } from 'react-icons/fa';
 import { FaHeart } from 'react-icons/fa6';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../utils/api/api';
 import { HttpMethod, type Notification } from '../../types';
 
 const NotificationPage = () => {
+  const queryClient = useQueryClient();
   const { data: notifications, isLoading } = useQuery({
     queryKey: ['notifications'],
     queryFn: () => api({ endpoint: '/notifications/all' }),
@@ -21,6 +22,9 @@ const NotificationPage = () => {
         method: HttpMethod.DELETE,
         successMessage: 'All notifications deleted',
       }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
   });
 
   const deleteNotifications = () => {

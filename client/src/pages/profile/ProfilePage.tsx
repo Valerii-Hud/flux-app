@@ -1,34 +1,54 @@
-import { useRef, useState, type ChangeEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useRef, useState, type ChangeEvent } from 'react';
+import { Link, useParams } from 'react-router-dom';
 
 import ProfileHeaderSkeleton from '../../components/skeletons/ProfileHeaderSkeleton';
 import EditProfileModal from './EditProfileModal';
-
-import { POSTS } from '../../utils/db/dummy';
 
 import { FaArrowLeft } from 'react-icons/fa6';
 import { IoCalendarOutline } from 'react-icons/io5';
 import { FaLink } from 'react-icons/fa';
 import { MdEdit } from 'react-icons/md';
-import type { User } from '../../types';
-import { useQueryClient } from '@tanstack/react-query';
-import { formatDate } from '../../utils/lib/formatDate';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { formatMemberSinceDate } from '../../utils/lib/formatDate';
+import { api } from '../../utils/api/api';
+import type { FeedType, User } from '../../types';
+import Posts from '../../components/common/Posts';
+import useFollow from '../../hooks/useFollow';
 
 const ProfilePage = () => {
+  const { followUnfollowUser, isPending } = useFollow();
+  const { userName } = useParams();
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [feedType, setFeedType] = useState('posts');
+  const [feedType, setFeedType] = useState<FeedType>('posts');
 
-  const queryClient = useQueryClient();
   const coverImageRef = useRef<HTMLInputElement | null>(null);
   const profileImageRef = useRef<HTMLInputElement | null>(null);
+  const queryClient = useQueryClient();
 
-  const isLoading = false;
-  const isMyProfile = true;
+  const { data: user, isLoading } = useQuery({
+    queryKey: [userName],
+    queryFn: () =>
+      api({
+        endpoint: `/users/profile/${userName}`,
+      }),
+  });
+  const authUser = queryClient.getQueryData<User>(['authUser']);
+  const { data: userPosts, refetch: refetchUserPosts } = useQuery({
+    queryKey: [`${user.userName}Posts`],
+    queryFn: () => api({ endpoint: `/posts/user/${userName}` }),
+  });
 
-  const user = queryClient.getQueryData<User>(['authUser']);
+  useEffect(() => {
+    refetchUserPosts();
+  }, [userName, refetchUserPosts]);
 
-  const handleImgChange = (e: ChangeEvent<HTMLInputElement>, state: string) => {
+  const isMyProfile = authUser?._id === user?._id;
+  type ImgState = 'coverImage' | 'profileImage';
+  const handleImgChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    state: ImgState
+  ) => {
     const files = e.target.files;
     if (files) {
       const file = files[0];
@@ -69,7 +89,7 @@ const ProfilePage = () => {
                 <div className="flex flex-col">
                   <p className="font-bold text-lg">{user?.fullName}</p>
                   <span className="text-sm text-slate-500">
-                    {POSTS?.length} posts
+                    {userPosts?.length} posts
                   </span>
                 </div>
               </div>
@@ -127,9 +147,17 @@ const ProfilePage = () => {
                 {!isMyProfile && (
                   <button
                     className="btn btn-outline rounded-full btn-sm"
-                    onClick={() => alert('Followed successfully')}
+                    onClick={() =>
+                      followUnfollowUser({
+                        userId: user?._id,
+                        userName: user?.userName,
+                      })
+                    }
+                    disabled={isPending}
                   >
-                    Follow
+                    {authUser?.following?.includes(user._id)
+                      ? 'Unfollow'
+                      : 'Follow'}
                   </button>
                 )}
                 {(coverImage || profileImage) && (
@@ -170,7 +198,7 @@ const ProfilePage = () => {
                   <div className="flex gap-2 items-center">
                     <IoCalendarOutline className="w-4 h-4 text-slate-500" />
                     <span className="text-sm text-slate-500">
-                      {formatDate(user.createdAt, 'full')}
+                      {formatMemberSinceDate(user.createdAt)}
                     </span>
                   </div>
                 </div>
@@ -212,7 +240,7 @@ const ProfilePage = () => {
             </>
           )}
 
-          {/* <Posts feedType={feedType} /> */}
+          <Posts feedType={feedType} userName={userName} userId={user?._id} />
         </div>
       </div>
     </>

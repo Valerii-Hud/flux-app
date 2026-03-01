@@ -63,7 +63,10 @@ type StaticEndpoint =
   // [Notifications]
   | '/notifications/all';
 
-type DynamicEndpoint = `/posts/${string}` | `/users/follow/${string}`;
+type DynamicEndpoint =
+  | `/posts/${string}`
+  | `/users/follow/${string}`
+  | `/users/profile/${string}`;
 
 export type Endpoint = StaticEndpoint | DynamicEndpoint;
 
@@ -74,4 +77,4 @@ export enum HttpMethod {
   DELETE = 'delete',
 }
 
-export type FeedType = 'all' | 'following';
+export type FeedType = 'all' | 'following' | 'posts' | 'likes';
