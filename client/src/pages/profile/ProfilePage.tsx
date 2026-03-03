@@ -7,7 +7,7 @@ import EditProfileModal from './EditProfileModal';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { IoCalendarOutline } from 'react-icons/io5';
 import { FaLink } from 'react-icons/fa';
-import { MdEdit } from 'react-icons/md';
+import { MdEdit, MdOutlineVerified } from 'react-icons/md';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { formatMemberSinceDate } from '../../utils/lib/formatDate';
 import { api } from '../../utils/api/api';
@@ -35,7 +35,7 @@ const ProfilePage = () => {
   });
   const authUser = queryClient.getQueryData<User>(['authUser']);
   const { data: userPosts, refetch: refetchUserPosts } = useQuery({
-    queryKey: [`${user.userName}Posts`],
+    queryKey: [`${userName}Posts`],
     queryFn: () => api({ endpoint: `/posts/user/${userName}` }),
   });
 
@@ -172,7 +172,14 @@ const ProfilePage = () => {
 
               <div className="flex flex-col gap-4 mt-14 px-4">
                 <div className="flex flex-col">
-                  <span className="font-bold text-lg">{user?.fullName}</span>
+                  <div className="flex">
+                    <span className="font-bold text-lg">{user?.fullName}</span>
+                    {user.isVerified && (
+                      <span className="font-bold text-lg pl-2 pt-1.5">
+                        <MdOutlineVerified />
+                      </span>
+                    )}
+                  </div>
                   <span className="text-sm text-slate-500">
                     @{user?.userName}
                   </span>
@@ -185,7 +192,7 @@ const ProfilePage = () => {
                       <>
                         <FaLink className="w-3 h-3 text-slate-500" />
                         <a
-                          href="https://youtube.com/@mrbeast"
+                          href={user.link}
                           target="_blank"
                           rel="noreferrer"
                           className="text-sm text-blue-500 hover:underline"
