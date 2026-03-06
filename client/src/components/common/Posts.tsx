@@ -12,8 +12,8 @@ import { api } from '../../utils/api/api';
 
 interface PostsProps {
   feedType: FeedType;
-  userName: string | undefined;
-  userId: string;
+  userName?: string | undefined;
+  userId?: string;
 }
 
 const Posts = ({ feedType, userName, userId }: PostsProps) => {

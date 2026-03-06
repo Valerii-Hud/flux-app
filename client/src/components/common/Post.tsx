@@ -10,6 +10,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../utils/api/api';
 import LoadingSpinner from './LoadingSpinner';
 import { formatPostDate } from '../../utils/lib/formatDate';
+import { MdOutlineVerified } from 'react-icons/md';
 
 const Post = ({ post }: { post: PostType }) => {
   const queryClient = useQueryClient();
@@ -41,7 +42,7 @@ const Post = ({ post }: { post: PostType }) => {
         if (!oldPosts) return [];
 
         return oldPosts.map((p) =>
-          p._id === post._id ? { ...p, likes: updatedLikes } : p
+          p._id === post._id ? { ...p, likes: updatedLikes } : p,
         );
       });
       queryClient.invalidateQueries({ queryKey: ['authUser'] });
@@ -68,7 +69,7 @@ const Post = ({ post }: { post: PostType }) => {
   const [comment, setComment] = useState('');
   const postOwner = post.user;
   const isLiked = authUser?.likedPosts?.some(
-    (id) => id.toString() === post._id?.toString()
+    (id) => id.toString() === post._id?.toString(),
   );
   const isMyPost = authUser?._id === post.user?._id;
 
@@ -81,7 +82,7 @@ const Post = ({ post }: { post: PostType }) => {
   };
 
   const handlePostComment = (
-    e: SyntheticEvent<HTMLFormElement, SubmitEvent>
+    e: SyntheticEvent<HTMLFormElement, SubmitEvent>,
   ) => {
     e.preventDefault();
     if (isPendingCommentPost) return;
@@ -109,6 +110,7 @@ const Post = ({ post }: { post: PostType }) => {
             <Link to={`/profile/${postOwner?.userName}`} className="font-bold">
               {postOwner?.fullName}
             </Link>
+            {postOwner?.isVerified && <MdOutlineVerified />}
             <span className="text-gray-700 flex gap-1 text-sm">
               <Link to={`/profile/${postOwner?.userName}`}>
                 @{postOwner?.userName}
@@ -145,7 +147,7 @@ const Post = ({ post }: { post: PostType }) => {
                 className="flex gap-1 items-center cursor-pointer group"
                 onClick={() => {
                   const dialog = document.getElementById(
-                    'comments_modal' + post._id
+                    'comments_modal' + post._id,
                   );
 
                   if (dialog instanceof HTMLDialogElement) {
