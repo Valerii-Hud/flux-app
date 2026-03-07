@@ -2,6 +2,7 @@ import express from 'express';
 import ENV_VARS from './utils/envVars.util';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import path from 'path';
 import { v2 as cloudinary } from 'cloudinary';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
@@ -19,6 +20,7 @@ const {
   CLOUDINARY_CLOUD_NAME,
   CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET,
+  NODE_ENV,
 } = ENV_VARS;
 
 cloudinary.config({
@@ -42,6 +44,13 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/posts', postRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
+
+if (NODE_ENV === 'production') {
+  app.use(express.static(path.join(path.resolve(), '/client/dist')));
+  app.get(/.*/, (_req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
+  });
+}
 
 app.listen(PORT, () => {
   connectToMongoDB(MONGO_URI, true);

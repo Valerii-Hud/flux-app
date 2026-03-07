@@ -14,7 +14,10 @@
     "@types/mongoose": "^5.11.97"
   },
   "scripts": {
-    "dev": "bun --watch ./server/src/index.ts"
+    "dev": "bun --watch ./server/src/index.ts",
+    "install": "cd server && bun install && cd .. && cd client && bun install",
+    "build": "cd server && tsc && cd .. && cd client && bun run build",
+    "start": "bun ./server/src/index.ts"
   },
   "peerDependencies": {
     "typescript": "^5"
