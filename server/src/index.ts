@@ -36,8 +36,8 @@ app.use(cookieParser(COOKIE_PARSER_SECRET));
 app.use(
   cors({
     origin:
-      NODE_ENV === 'production'
-        ? 'https://flux-app-fvu2.onrender.com'
+      NODE_ENV !== 'development'
+        ? 'https://flux-app-fvu2.onrender.com/'
         : 'http://localhost:3000',
     credentials: true,
   })
