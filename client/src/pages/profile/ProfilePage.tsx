@@ -11,15 +11,18 @@ import { MdEdit, MdOutlineVerified } from 'react-icons/md';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { formatMemberSinceDate } from '../../utils/lib/formatDate';
 import { api } from '../../utils/api/api';
-import type { FeedType, User } from '../../types';
+import { type FeedType, type User } from '../../types';
 import Posts from '../../components/common/Posts';
 import useFollow from '../../hooks/useFollow';
+import useUpdateUserProfile from '../../hooks/useUpdateUserProfile';
 
 const ProfilePage = () => {
   const { followUnfollowUser, isPending } = useFollow();
   const { userName } = useParams();
-  const [coverImage, setCoverImage] = useState<string | null>(null);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [coverImage, setCoverImage] = useState<string | undefined>(undefined);
+  const [profileImage, setProfileImage] = useState<string | undefined>(
+    undefined
+  );
   const [feedType, setFeedType] = useState<FeedType>('posts');
 
   const coverImageRef = useRef<HTMLInputElement | null>(null);
@@ -39,8 +42,14 @@ const ProfilePage = () => {
     queryFn: () => api({ endpoint: `/posts/user/${userName}` }),
   });
 
+  const { updateProfile, isUpdatingProfile } = useUpdateUserProfile({
+    data: { coverImage, profileImage },
+    userName: userName || '',
+  });
+
   useEffect(() => {
     refetchUserPosts();
+    document.title = `@${userName} profile`;
   }, [userName, refetchUserPosts]);
 
   const isMyProfile = authUser?._id === user?._id;
@@ -143,7 +152,9 @@ const ProfilePage = () => {
                 </div>
               </div>
               <div className="flex justify-end px-4 mt-5">
-                {isMyProfile && <EditProfileModal />}
+                {isMyProfile && userName && (
+                  <EditProfileModal userName={userName} />
+                )}
                 {!isMyProfile && (
                   <button
                     className="btn btn-outline rounded-full btn-sm"
@@ -163,9 +174,9 @@ const ProfilePage = () => {
                 {(coverImage || profileImage) && (
                   <button
                     className="btn btn-primary rounded-full btn-sm text-white px-4 ml-2"
-                    onClick={() => alert('Profile updated successfully')}
+                    onClick={() => updateProfile()}
                   >
-                    Update
+                    {isUpdatingProfile ? 'Updating...' : 'Update'}
                   </button>
                 )}
               </div>

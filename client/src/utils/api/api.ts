@@ -3,6 +3,7 @@ import {
   type Comment,
   type Endpoint,
   type PostType,
+  type ProfileImages,
   type User,
 } from '../../types';
 import axiosInstance from './axios';
@@ -11,7 +12,7 @@ import { successHandler } from '../handlers/successHandler';
 
 interface Api {
   endpoint: Endpoint;
-  data?: User | PostType | Comment | string;
+  data?: User | PostType | Comment | ProfileImages | string;
   method?: HttpMethod;
   showSuccessMessage?: boolean;
   showFailMessage?: boolean;

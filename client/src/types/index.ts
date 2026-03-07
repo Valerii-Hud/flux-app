@@ -60,6 +60,7 @@ type StaticEndpoint =
 
   // [Users]
   | '/users/suggested'
+  | '/users/update'
   // [Notifications]
   | '/notifications/all';
 
@@ -69,6 +70,10 @@ type DynamicEndpoint =
   | `/users/profile/${string}`;
 
 export type Endpoint = StaticEndpoint | DynamicEndpoint;
+export interface ProfileImages {
+  coverImage: string | null;
+  profileImage: string | null;
+}
 
 export enum HttpMethod {
   POST = 'post',

@@ -1,12 +1,17 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useState, type ChangeEvent } from 'react';
+import type { User } from '../../types';
+import useUpdateUserProfile from '../../hooks/useUpdateUserProfile';
 
-const EditProfileModal = () => {
+const EditProfileModal = ({ userName }: { userName: string }) => {
+  const queryClient = useQueryClient();
+  const authUser = queryClient.getQueryData<User>(['authUser']);
   const [formData, setFormData] = useState({
-    fullName: '',
-    userName: '',
-    email: '',
-    bio: '',
-    link: '',
+    fullName: authUser?.fullName || '',
+    userName: authUser?.userName || '',
+    email: authUser?.email || '',
+    bio: authUser?.bio || '',
+    link: authUser?.link || '',
     newPassword: '',
     currentPassword: '',
   });
@@ -16,6 +21,10 @@ const EditProfileModal = () => {
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+  const { updateProfile, isUpdatingProfile } = useUpdateUserProfile({
+    data: formData,
+    userName,
+  });
 
   return (
     <>
@@ -38,7 +47,11 @@ const EditProfileModal = () => {
             className="flex flex-col gap-4"
             onSubmit={(e) => {
               e.preventDefault();
-              alert('Profile updated successfully');
+              updateProfile();
+              const dialog = document.getElementById('edit_profile_modal');
+              if (dialog instanceof HTMLDialogElement) {
+                dialog.close();
+              }
             }}
           >
             <div className="flex flex-wrap gap-2">
@@ -103,7 +116,7 @@ const EditProfileModal = () => {
               onChange={handleInputChange}
             />
             <button className="btn btn-primary rounded-full btn-sm text-white">
-              Update
+              {isUpdatingProfile ? 'Updating...' : 'Update'}
             </button>
           </form>
         </div>
