@@ -1,13 +1,10 @@
-import XSvg from '../svgs/X';
-
 import { MdHomeFilled } from 'react-icons/md';
 import { IoNotifications } from 'react-icons/io5';
 import { FaUser } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { BiLogOut } from 'react-icons/bi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { successHandler } from '../../utils/handlers/successHandler';
-import { errorHandler } from '../../utils/handlers/errorHandler';
+
 import type { MouseEvent } from 'react';
 import { HttpMethod, type User } from '../../types';
 import { api } from '../../utils/api/api';
@@ -17,12 +14,14 @@ const Sidebar = () => {
 
   const { mutate: logout } = useMutation({
     mutationFn: () =>
-      api({ endpoint: '/auth/logout', method: HttpMethod.POST }),
+      api({
+        endpoint: '/auth/logout',
+        method: HttpMethod.POST,
+        successMessage: 'Logout successfully',
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['authUser'] });
-      successHandler('Logout successfully');
     },
-    onError: (error) => errorHandler(error),
   });
 
   const handleLogout = (event: MouseEvent) => {
@@ -33,7 +32,10 @@ const Sidebar = () => {
     <div className="md:flex-[2_2_0] w-18 max-w-52">
       <div className="sticky top-0 left-0 h-screen flex flex-col border-r border-gray-700 w-20 md:w-full">
         <Link to="/" className="flex justify-center md:justify-start">
-          <XSvg className="px-2 w-12 h-12 rounded-full fill-white hover:bg-stone-900" />
+          <img
+            className="px-2 size-13  fill-white hover:bg-stone-900"
+            src="/flux-logo.png"
+          />
         </Link>
         <ul className="flex flex-col gap-3 mt-4">
           <li className="flex justify-center md:justify-start">
@@ -84,11 +86,11 @@ const Sidebar = () => {
                 </p>
                 <p className="text-slate-500 text-sm">@{authUser?.userName}</p>
               </div>
-              <BiLogOut
-                className="w-5 h-5 cursor-pointer"
-                onClick={handleLogout}
-              />
             </div>
+            <BiLogOut
+              className="w-5 h-5 cursor-pointer"
+              onClick={handleLogout}
+            />
           </Link>
         )}
       </div>

@@ -39,7 +39,10 @@ const LoginPage = () => {
   return (
     <div className="max-w-screen-xl mx-auto flex h-screen">
       <div className="flex-1 hidden lg:flex items-center  justify-center">
-        <XSvg className="lg:w-2/3 fill-white" />
+        <img
+          className="lg:w-2/3 fill-white rounded-full"
+          src="/flux-logo.png"
+        />
       </div>
       <div className="flex-1 flex flex-col justify-center items-center">
         <form className="flex gap-4 flex-col" onSubmit={handleSubmit}>

@@ -17,7 +17,7 @@ interface Api {
   showSuccessMessage?: boolean;
   showFailMessage?: boolean;
   successMessage?: string;
-  apiVersion?: '1' | '2';
+  apiVersion?: '1' | '2' | 'latest';
 }
 
 export const api = async ({

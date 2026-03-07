@@ -92,6 +92,7 @@ export const logout = (req: Request, res: Response) => {
       httpOnly: true,
       secure: NODE_ENV === 'production',
       sameSite: NODE_ENV === 'production' ? 'strict' : 'lax',
+      signed: true,
     });
     res.status(200).json({ message: 'Logout successfully' });
   } catch (error) {

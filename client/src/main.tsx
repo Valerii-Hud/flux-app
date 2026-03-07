@@ -19,6 +19,7 @@ const queryClient = new QueryClient({
         api({
           endpoint: '/auth/check-auth',
           method: HttpMethod.GET,
+          showFailMessage: false,
         }),
     },
   },
