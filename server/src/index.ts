@@ -37,7 +37,7 @@ app.use(
   cors({
     origin:
       NODE_ENV !== 'development'
-        ? 'https://flux-app-fvu2.onrender.com/'
+        ? 'https://flux-app-fvu2.onrender.com'
         : 'http://localhost:3000',
     credentials: true,
   })
@@ -49,7 +49,9 @@ app.use('/api/v1/posts', postRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 
 if (NODE_ENV === 'production') {
-  app.use(express.static(path.join(path.resolve(), '/client/dist')));
+  const frontendPath = path.join(__dirname, '../../client/dist');
+
+  app.use(express.static(frontendPath));
   app.get(/.*/, (_req, res) => {
     res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
   });
