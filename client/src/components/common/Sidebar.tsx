@@ -20,6 +20,7 @@ const Sidebar = () => {
         successMessage: 'Logout successfully',
       }),
     onSuccess: () => {
+      queryClient.setQueryData(['authUser'], null);
       queryClient.invalidateQueries({ queryKey: ['authUser'] });
     },
   });

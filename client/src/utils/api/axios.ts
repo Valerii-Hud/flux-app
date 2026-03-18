@@ -1,7 +1,10 @@
 import axios from 'axios';
-const NODE_ENV = 'production';
+
+type NodeEnv = 'production' | 'development';
+
+const NODE_ENV: NodeEnv = 'production';
 const BASE_URL =
-  NODE_ENV === 'production'
+  NODE_ENV === 'development'
     ? 'https://flux-app-fvu2.onrender.com/'
     : 'http://localhost:5000/';
 const axiosInstance = axios.create({

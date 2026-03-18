@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Posts from '../../components/common/Posts.tsx';
 import CreatePost from './CreatePost';
@@ -6,7 +6,9 @@ import type { FeedType } from '../../types/index.ts';
 
 const HomePage = () => {
   const [feedType, setFeedType] = useState<FeedType>('all');
-
+  useEffect(() => {
+    document.title = 'Flux';
+  }, []);
   return (
     <>
       <div className="flex-[4_4_0] mr-auto border-r border-gray-700 min-h-screen">

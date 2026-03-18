@@ -5,6 +5,8 @@ import ProfileHeaderSkeleton from '../../components/skeletons/ProfileHeaderSkele
 import EditProfileModal from './EditProfileModal';
 
 import { FaArrowLeft } from 'react-icons/fa6';
+import { BsBan } from 'react-icons/bs';
+
 import { IoCalendarOutline } from 'react-icons/io5';
 import { FaLink } from 'react-icons/fa';
 import { MdEdit, MdOutlineVerified } from 'react-icons/md';
@@ -21,7 +23,7 @@ const ProfilePage = () => {
   const { userName } = useParams();
   const [coverImage, setCoverImage] = useState<string | undefined>(undefined);
   const [profileImage, setProfileImage] = useState<string | undefined>(
-    undefined
+    undefined,
   );
   const [feedType, setFeedType] = useState<FeedType>('posts');
 
@@ -56,7 +58,7 @@ const ProfilePage = () => {
   type ImgState = 'coverImage' | 'profileImage';
   const handleImgChange = (
     e: ChangeEvent<HTMLInputElement>,
-    state: ImgState
+    state: ImgState,
   ) => {
     const files = e.target.files;
     if (files) {
@@ -190,10 +192,16 @@ const ProfilePage = () => {
                         <MdOutlineVerified />
                       </span>
                     )}
+                    {user?.isBanned && (
+                      <span className=" text-center  ml-2 mt-2 text-red-500 ">
+                        <BsBan />
+                      </span>
+                    )}
                   </div>
                   <span className="text-sm text-slate-500">
                     @{user?.userName}
                   </span>
+
                   <span className="text-sm my-1">{user?.bio}</span>
                 </div>
 
@@ -235,30 +243,35 @@ const ProfilePage = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex w-full border-b border-gray-700 mt-4">
-                <div
-                  className="flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 relative cursor-pointer"
-                  onClick={() => setFeedType('posts')}
-                >
-                  Posts
-                  {feedType === 'posts' && (
-                    <div className="absolute bottom-0 w-10 h-1 rounded-full bg-primary" />
-                  )}
+
+              {!user?.isBanned && (
+                <div className="flex w-full border-b border-gray-700 mt-4">
+                  <div
+                    className="flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 relative cursor-pointer"
+                    onClick={() => setFeedType('posts')}
+                  >
+                    Posts
+                    {feedType === 'posts' && (
+                      <div className="absolute bottom-0 w-10 h-1 rounded-full bg-primary" />
+                    )}
+                  </div>
+                  <div
+                    className="flex justify-center flex-1 p-3 text-slate-500 hover:bg-secondary transition duration-300 relative cursor-pointer"
+                    onClick={() => setFeedType('likes')}
+                  >
+                    Likes
+                    {feedType === 'likes' && (
+                      <div className="absolute bottom-0 w-10  h-1 rounded-full bg-primary" />
+                    )}
+                  </div>
                 </div>
-                <div
-                  className="flex justify-center flex-1 p-3 text-slate-500 hover:bg-secondary transition duration-300 relative cursor-pointer"
-                  onClick={() => setFeedType('likes')}
-                >
-                  Likes
-                  {feedType === 'likes' && (
-                    <div className="absolute bottom-0 w-10  h-1 rounded-full bg-primary" />
-                  )}
-                </div>
-              </div>
+              )}
             </>
           )}
 
-          <Posts feedType={feedType} userName={userName} userId={user?._id} />
+          {!user?.isBanned && (
+            <Posts feedType={feedType} userName={userName} userId={user?._id} />
+          )}
         </div>
       </div>
     </>

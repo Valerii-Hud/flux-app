@@ -19,6 +19,8 @@ export interface User extends MongooseTypes {
   followers?: Id[] | User[];
   following?: Id[] | User[];
   likedPosts?: Id[];
+  isMuted?: boolean;
+  isBanned?: boolean;
 }
 
 export interface Comment extends MongooseTypes {

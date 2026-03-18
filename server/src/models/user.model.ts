@@ -66,6 +66,24 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isBanned: {
+      type: Boolean,
+      default: false,
+    },
+    isMuted: {
+      type: Boolean,
+      default: false,
+    },
+    profileType: {
+      type: String,
+      default: 'public',
+      enum: ['public', 'private'],
+    },
+    rank: {
+      type: String,
+      default: 'user',
+      enum: ['user', 'administrator', 'moderator', 'helper', 'support'],
+    },
     likedPosts: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -74,7 +92,7 @@ const userSchema = new mongoose.Schema(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const User = mongoose.model('User', userSchema);

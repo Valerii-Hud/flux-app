@@ -97,7 +97,7 @@ const Post = ({ post }: { post: PostType }) => {
   return (
     <>
       <div className="flex gap-2 items-start p-4 border-b border-gray-700">
-        <div className="avatar">
+        <div className="avatar size-8">
           <Link
             to={`/profile/${postOwner?.userName}`}
             className="w-8 rounded-full overflow-hidden"
@@ -180,7 +180,7 @@ const Post = ({ post }: { post: PostType }) => {
                           className="flex gap-2 items-start"
                         >
                           <div className="avatar">
-                            <div className="w-8 rounded-full">
+                            <div className="w-8 rounded-full bg-red-500">
                               <img
                                 src={
                                   comment.user?.profileImage ||
@@ -203,24 +203,26 @@ const Post = ({ post }: { post: PostType }) => {
                         </div>
                       ))}
                   </div>
-                  <form
-                    className="flex gap-2 items-center mt-4 border-t border-gray-600 pt-2"
-                    onSubmit={handlePostComment}
-                  >
-                    <textarea
-                      className="textarea w-full p-1 rounded text-md resize-none border focus:outline-none  border-gray-800"
-                      placeholder="Add a comment..."
-                      value={comment}
-                      onChange={(e) => setComment(e.target.value)}
-                    />
-                    <button className="btn btn-primary rounded-full btn-sm text-white px-4">
-                      {isPendingCommentPost ? (
-                        <span className="loading loading-spinner loading-md"></span>
-                      ) : (
-                        'Post'
-                      )}
-                    </button>
-                  </form>
+                  {!authUser?.isBanned && !authUser?.isMuted && (
+                    <form
+                      className="flex gap-2 items-center mt-4 border-t border-gray-600 pt-2"
+                      onSubmit={handlePostComment}
+                    >
+                      <textarea
+                        className="textarea w-full p-1 rounded text-md resize-none border focus:outline-none  border-gray-800"
+                        placeholder="Add a comment..."
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                      />
+                      <button className="btn btn-primary rounded-full btn-sm text-white px-4">
+                        {isPendingCommentPost ? (
+                          <span className="loading loading-spinner loading-md"></span>
+                        ) : (
+                          'Post'
+                        )}
+                      </button>
+                    </form>
+                  )}
                 </div>
                 <form method="dialog" className="modal-backdrop">
                   <button className="outline-none">close</button>
